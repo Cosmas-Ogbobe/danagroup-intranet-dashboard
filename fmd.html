@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Enterprise Fleet Management</title>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, sans-serif;
+}
+
+body{
+display:flex;
+background:#f4f7fb;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:240px;
+background:#00356B;
+color:white;
+height:100vh;
+padding:20px;
+position:fixed;
+}
+
+.logo{
+font-size:20px;
+font-weight:600;
+margin-bottom:30px;
+}
+
+.menu{
+list-style:none;
+}
+
+.menu li{
+margin-bottom:8px;
+}
+
+.menu a{
+display:flex;
+gap:10px;
+padding:12px;
+color:white;
+text-decoration:none;
+border-radius:6px;
+}
+
+.menu a:hover{
+background:#db3214;
+}
+
+/* MAIN */
+
+.main{
+margin-left:240px;
+width:100%;
+}
+
+/* TOPBAR */
+
+.topbar{
+background:white;
+padding:15px 25px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* STATS */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+padding:25px;
+}
+
+.stat{
+padding:20px;
+border-radius:10px;
+color:white;
+}
+
+.blue{background:#2563eb;}
+.green{background:#22c55e;}
+.orange{background:#f97316;}
+.red{background:#ef4444;}
+
+.stat h2{
+margin-top:8px;
+}
+
+/* CHARTS */
+
+.charts{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
+gap:20px;
+padding:0 25px 25px 25px;
+}
+
+.chart-card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* GRID PANELS */
+
+.panels{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:20px;
+padding:0 25px 25px 25px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #eee;
+font-size:14px;
+}
+
+th{
+text-align:left;
+background:#f4f6fb;
+}
+
+/* ALERT */
+
+.alert{
+padding:10px;
+margin-bottom:10px;
+border-radius:6px;
+font-size:14px;
+}
+
+.alert-red{background:#fee2e2;color:#991b1b;}
+.alert-orange{background:#fff7ed;color:#9a3412;}
+
+.map{
+height:250px;
+background:#e5e7eb;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:8px;
+color:#555;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<div class="logo">Fleet System</div>
+
+<ul class="menu">
+
+<li><a href="#"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+<li><a href="#"><i data-lucide="car"></i> Vehicles</a></li>
+<li><a href="#"><i data-lucide="calendar"></i> Bookings</a></li>
+<li><a href="#"><i data-lucide="wrench"></i> Maintenance</a></li>
+<li><a href="#"><i data-lucide="map"></i> Tracking</a></li>
+<li><a href="#"><i data-lucide="file-text"></i> Reports</a></li>
+
+</ul>
+
+</div>
+
+
+<div class="main">
+
+<div class="topbar">
+<h3>Fleet & Facility Enterprise Dashboard</h3>
+</div>
+
+<!-- STATS -->
+
+<div class="stats">
+
+<div class="stat blue">
+Total Vehicles
+<h2>58</h2>
+</div>
+
+<div class="stat green">
+Available
+<h2>32</h2>
+</div>
+
+<div class="stat orange">
+Assigned
+<h2>18</h2>
+</div>
+
+<div class="stat red">
+Maintenance
+<h2>8</h2>
+</div>
+
+</div>
+
+
+<!-- CHARTS -->
+
+<div class="charts">
+
+<div class="chart-card">
+<h3>Vehicle Status</h3>
+<canvas id="vehicleStatus"></canvas>
+</div>
+
+<div class="chart-card">
+<h3>Fuel Cost Trend</h3>
+<canvas id="fuelCost"></canvas>
+</div>
+
+<div class="chart-card">
+<h3>Driver Performance</h3>
+<canvas id="driverChart"></canvas>
+</div>
+
+<div class="chart-card">
+<h3>Vehicle Usage by Department</h3>
+<canvas id="deptChart"></canvas>
+</div>
+
+</div>
+
+
+<!-- PANELS -->
+
+<div class="panels">
+
+<!-- GPS TRACKING -->
+
+<div class="card">
+
+<h3>Live Vehicle Tracking</h3>
+
+<div class="map">
+GPS MAP INTEGRATION AREA
+</div>
+
+</div>
+
+
+<!-- ALERTS -->
+
+<div class="card">
+
+<h3>Maintenance Alerts</h3>
+
+<div class="alert alert-red">
+Vehicle FG-204-AA requires urgent brake service
+</div>
+
+<div class="alert alert-orange">
+Toyota Hilux oil change due in 3 days
+</div>
+
+<div class="alert alert-orange">
+Ford Ranger inspection due next week
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MAINTENANCE TABLE -->
+
+<div class="card" style="margin:25px">
+
+<h3>Upcoming Maintenance Schedule</h3>
+
+<table>
+
+<tr>
+<th>Vehicle</th>
+<th>Service</th>
+<th>Date</th>
+<th>Status</th>
+</tr>
+
+<tr>
+<td>Toyota Hilux</td>
+<td>Oil Change</td>
+<td>July 21</td>
+<td>Pending</td>
+</tr>
+
+<tr>
+<td>Ford Ranger</td>
+<td>Brake Inspection</td>
+<td>July 25</td>
+<td>Scheduled</td>
+</tr>
+
+<tr>
+<td>Nissan Patrol</td>
+<td>Engine Service</td>
+<td>Aug 02</td>
+<td>Scheduled</td>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+
+<script>
+
+lucide.createIcons();
+
+/* Vehicle Status */
+
+new Chart(vehicleStatus,{
+type:"doughnut",
+data:{
+labels:["Available","Assigned","Maintenance"],
+datasets:[{
+data:[32,18,8],
+backgroundColor:["#22c55e","#2563eb","#ef4444"]
+}]
+}
+});
+
+/* Fuel Cost */
+
+new Chart(fuelCost,{
+type:"line",
+data:{
+labels:["Jan","Feb","Mar","Apr","May","Jun"],
+datasets:[{
+label:"Fuel Cost ($)",
+data:[2000,2400,2100,2600,2500,2800],
+borderColor:"#db3214",
+backgroundColor:"rgba(219,50,20,0.1)",
+fill:true
+}]
+}
+});
+
+/* Driver Performance */
+
+new Chart(driverChart,{
+type:"bar",
+data:{
+labels:["Driver A","Driver B","Driver C","Driver D"],
+datasets:[{
+label:"Trips Completed",
+data:[45,38,52,41],
+backgroundColor:"#00356B"
+}]
+}
+});
+
+/* Department Usage */
+
+new Chart(deptChart,{
+type:"bar",
+data:{
+labels:["Operations","HR","IT","Admin","Finance"],
+datasets:[{
+label:"Vehicle Usage",
+data:[15,8,10,12,7],
+backgroundColor:"#2563eb"
+}]
+}
+});
+
+</script>
+
+</body>
+</html>
