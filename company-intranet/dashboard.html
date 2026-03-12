@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Company Intranet Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+<div class="flex">
+
+<!-- SIDEBAR -->
+
+<aside class="w-64 bg-[#00356B] shadow-md p-6 h-screen">
+
+<ul class="space-y-5 text-white">
+
+<li class="flex items-center gap-3 bg-white text-[#00356B] p-3 rounded-full">
+<i data-lucide="layout-dashboard"></i> Dashboard
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="message-square"></i> Chats & Events
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="calendar"></i> Calendar
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="image"></i> Posts
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="user"></i> HR Tools
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="mail"></i> Email Login
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="folder-plus"></i> DMS
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="check-circle"></i> Asset Portal
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="file"></i> SOP Portal
+</li>
+
+<li class="flex items-center gap-3 p-2">
+<i data-lucide="heart-pulse"></i> HMO Portal
+</li>
+
+</ul>
+
+</aside>
+
+<!-- MAIN CONTENT -->
+
+<div class="flex-1 p-8">
+
+<!-- HEADER -->
+
+<div class="flex justify-between items-center mb-8">
+
+<div class= "bg-gradient-to-r from-gray-100 to-gray-100 rounded-lg p-5 text-white ">
+<!-- <p class="text-gray-400">Welcome!</p> -->
+<h2 class="font-bold text-[#00356B] text-lg">Welcome Cosmas</h2>
+<p class="text-sm text-[#00356B] mt-1">Great to see you back on the dashboard today</p>
+</div>
+
+<button class="bg-red-600 text-white px-4 py-2 rounded-lg flex gap-2 items-center">
+<i data-lucide="click"></i> Logout
+</button>
+
+</div>
+
+<!-- TOP METRIC CARDS (WARM COLORS) -->
+
+<div class="grid grid-cols-4 gap-6 mb-6">
+
+<!-- <div class="rounded-xl shadow p-6 bg-gradient-to-r from-amber-200 to-orange-200">
+<p class="text-sm">Active Employees</p>
+<h2 class="text-2xl font-bold">86</h2>
+</div>
+
+<div class="rounded-xl shadow p-6 bg-gradient-to-r from-red-200 to-yellow-300">
+<p class="text-sm">Active Users Online</p>
+<h2 class="text-2xl font-bold">12</h2>
+</div> -->
+
+<div class="relative rounded-xl shadow p-6 bg-[#00356B]">
+
+  <!-- Avatars top right -->
+  <div class="absolute top-4 right-4 flex -space-x-2">
+    <img class="w-8 h-8 rounded-full border-2 border-white"
+         src="https://i.pravatar.cc/40?img=12"
+         alt="user1">
+    <img class="w-8 h-8 rounded-full border-2 border-white"
+         src="https://i.pravatar.cc/40?img=32"
+         alt="user2">
+  </div>
+
+  <p class="text-green-400 text-sm font-bold">Active Employees</p>
+  <p class="text-3xl font-bold text-red-600 mt-2">248</p>
+  <p class="text-xs font-bold text-white mt-2">↑ 2 new hires this week</p>
+
+</div>
+
+
+
+<div class="bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-300 rounded-lg p-5 hover:shadow-lg transition-shadow">
+              <p class="text-black text-sm font-bold">New Joiners</p>
+              <p class="text-3xl font-bold text-slate-700 mt-2">5</p>
+              <p class="text-xs font-bold text-black mt-2">Q1 2026</p>
+             </div>
+<div class="bg-blue-100 border border-gray-200 rounded-lg p-6">
+
+  <!-- Birthday Avatars -->
+  <div class="absolute top-4 right-4 flex -space-x-2">
+    <img class="w-9 h-9 rounded-full border-2 border-white"
+         src="https://i.pravatar.cc/40?img=12"
+         alt="employee">
+    <img class="w-9 h-9 rounded-full border-2 border-white"
+         src="https://i.pravatar.cc/40?img=32"
+         alt="employee">
+  </div>
+
+  <p class="text-gray-600 text-sm font-medium">Upcoming Birthdays</p>
+
+  <p class="text-3xl font-bold text-purple-700 mt-2 flex items-center gap-2">
+    2 <span class="text-xl">🎂</span>
+  </p>
+
+  <p class="text-xs text-purple-700 mt-2">Celebrations this month</p>
+
+</div>
+
+<div class="relative rounded-xl shadow p-6 bg-gray-400">
+
+  <!-- Avatars top right -->
+  <div class="absolute top-4 right-4 flex -space-x-2">
+
+    <!-- User 1 -->
+    <div class="relative">
+      <img class="w-8 h-8 rounded-full border-2 border-white"
+           src="https://i.pravatar.cc/40?img=12"
+           alt="user1">
+      <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+    </div>
+
+    <!-- User 2 -->
+    <div class="relative">
+      <img class="w-8 h-8 rounded-full border-2 border-white"
+           src="https://i.pravatar.cc/40?img=32"
+           alt="user2">
+      <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+    </div>
+
+  </div>
+
+  <p class="text-black text-sm font-bold">Online Now</p>
+  <p class="text-3xl font-bold text-white mt-2">102</p>
+  <p class="text-xs font-bold text-black mt-2">Currently active</p>
+
+</div>
+
+<!-- <div class="rounded-xl shadow p-6 bg-gradient-to-r from-rose-200 to-rose-300">
+<p class="text-sm">Departments</p>
+<h2 class="text-2xl font-bold">7</h2>
+</div> -->
+
+</div>
+
+<!-- MAIN GRID -->
+
+<div class="grid grid-cols-3 gap-6">
+
+<!-- ANNOUNCEMENT CARD -->
+
+<div class="bg-white rounded-xl shadow p-6">
+
+<h3 class="font-bold text-green-500">Announcements</h3>
+
+<div class="flex gap-3">
+
+<!-- <img src="https://i.pravatar.cc/50?img=8" class="rounded-full"> -->
+<img src="https://ui-avatars.com/api/?name=Dana+Group&background=1e3a8a&color=ffffff&size=128" class="w-10 h-10 rounded-full">
+<div>
+
+<p class="font-bold text-white">
+HR Department
+</p>
+
+<p class="text-sm text-black mt-1">
+All employees should complete the new compliance training before Friday.
+This is mandatory for everyone to ensure we meet our regulatory requirements.
+</p>
+
+<span class="text-xs text-gray-400">
+2 hours ago
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- CALENDAR -->
+
+<div class="bg-white rounded-xl shadow p-6">
+
+<h3 class="mb-4 font-medium" >Calendar</h3>
+
+<div id="calendar"></div>
+
+</div>
+
+<!-- ONLINE USERS -->
+
+<div class="bg-white rounded-xl shadow p-6">
+
+<h3 class="mb-4 font-medium">Online Now</h3>
+
+<div class="space-y-3">
+
+<div class="flex items-center gap-3">
+<img src="https://i.pravatar.cc/40?img=1" class="rounded-full">
+<span>Ahmed</span>
+<span class="w-2 h-2 bg-green-500 rounded-full ml-auto"></span>
+</div>
+
+<div class="flex items-center gap-3">
+<img src="https://i.pravatar.cc/40?img=2" class="rounded-full">
+<span>Eman</span>
+<span class="w-2 h-2 bg-green-500 rounded-full ml-auto"></span>
+</div>
+
+<div class="flex items-center gap-3">
+<img src="https://i.pravatar.cc/40?img=3" class="rounded-full">
+<span>Faisal</span>
+<span class="w-2 h-2 bg-green-500 rounded-full ml-auto"></span>
+</div>
+
+</div>
+
+</div>
+
+<!-- LIVE CHAT -->
+
+<div class="bg-white rounded-xl shadow p-6">
+
+<h3 class="mb-4 font-medium">Team Chat</h3>
+
+<div id="chatMessages" class="h-40 overflow-y-auto text-sm space-y-2 mb-3"></div>
+
+<div class="flex gap-2">
+
+<input id="chatInput" class="border p-2 flex-1 rounded" placeholder="Message...">
+
+<button onclick="sendChat()" class="bg-green-600 text-white px-3 rounded">
+Send
+</button>
+
+</div>
+
+</div>
+
+<!-- UPCOMING BIRTHDAYS -->
+
+<div class="bg-white rounded-xl shadow p-6">
+
+<h3 class="text-blue-500 mb-4 font-bold">Upcoming Birthdays</h3>
+
+<div class="space-y-3">
+
+<div class="flex items-center gap-3">
+<img src="https://i.pravatar.cc/40?img=4" class="rounded-full">
+<span>Olamide - Jul 25</span>
+</div>
+
+<div class="flex items-center gap-3">
+<img src="https://i.pravatar.cc/40?img=5" class="rounded-full">
+<span>Davido - Jul 28</span>
+</div>
+
+</div>
+
+</div>
+
+<!-- NEW EMPLOYEES (WARM YELLOW) -->
+
+<div class="rounded-xl shadow p-6 bg-[#00356B]">
+
+<h3 class="mb-4 font-bold text-white">New Employees</h3>
+
+<div class="space-y-3">
+
+<div class="flex items-center gap-3">
+<img src="https://i.pravatar.cc/40?img=6" class="rounded-full">
+<span class="text-white">Musa Ali</span>
+</div>
+
+<div class="flex items-center gap-3">
+<img src="https://i.pravatar.cc/40?img=7" class="rounded-full">
+<span class="text-white">James Odogwu </span>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+lucide.createIcons()
+
+function sendChat(){
+
+let input=document.getElementById("chatInput")
+
+if(input.value==="") return
+
+let div=document.createElement("div")
+
+div.textContent=input.value
+
+document.getElementById("chatMessages").appendChild(div)
+
+input.value=""
+
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+
+let calendarEl=document.getElementById('calendar')
+
+let calendar=new FullCalendar.Calendar(calendarEl,{
+
+initialView:'dayGridMonth',
+
+height:250,
+
+events:[
+{title:'Sprint Meeting',date:'2026-07-22'},
+{title:'HR Training',date:'2026-07-24'},
+{title:'Company Party',date:'2026-07-28'}
+]
+
+})
+
+calendar.render()
+
+})
+
+</script>
+
+</body>
+</html>

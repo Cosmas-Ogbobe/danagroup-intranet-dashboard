@@ -1,0 +1,1147 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail &amp; Intranet</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    * { font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif; }
+    html, body { background: #ffffff; }
+    .email-row { transition: background 0.15s ease; border-left: 3px solid transparent; }
+    .email-row:hover { background: #f5f5f5; }
+    .email-row.unread { background: #fef7e0; font-weight: 500; border-left-color: #f7b500; }
+    .email-row.selected { background: #f1f3f4; border-left-color: #1f2937; }
+    .folder-link { transition: all 0.2s ease; color: #5f6368; }
+    .folder-link:hover { background: #f1f3f4; color: #202124; }
+    .folder-link.active { background: #fce8e6; color: #c5221f; font-weight: 500; }
+    .intranet-tab-link { transition: all 0.2s ease; color: #5f6368; }
+    .intranet-tab-link:hover { background: #f1f3f4; color: #202124; }
+    .intranet-tab-link.active { background: #e3f2fd; color: #1565c0; font-weight: 500; }
+    .compose-btn { transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+    .compose-btn:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); }
+    .compose-window { animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: 1px solid #ccc; }
+    .compose-backdrop { animation: fadeIn 0.3s ease-out; }
+    @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .email-content { line-height: 1.6; color: #3c4043; }
+    .resize-handle { cursor: col-resize; user-select: none; transition: background 0.2s ease; }
+    .resize-handle:hover { background: #e5e7eb; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-white text-gray-900 overflow-hidden">
+  <div class="flex h-full w-full"><!-- Top Navigation -->
+   <div class="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-40">
+    <h1 id="company-name-header" class="text-xl font-bold text-gray-900" style="color: #202124; min-width: fit-content;">Dana Group</h1>
+    <div class="flex items-center gap-6">
+     <div class="relative">
+      <input type="text" placeholder="Search..." class="bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-gray-400 transition-all w-64" style="color: #3c4043;">
+     </div>
+     <div class="flex items-center gap-4">
+      <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative" title="Notifications">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+       </svg><span class="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full"></span> </button>
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 flex items-center justify-center text-white text-sm font-semibold cursor-pointer hover:shadow-lg transition-shadow" title="Profile">
+       JD
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="flex h-full w-full pt-14"><!-- Intranet Section -->
+    <div id="intranet-section" class="flex h-full w-full">
+     <div id="intranet-section" class="flex h-full w-full"><!-- Intranet Sidebar with Tabs -->
+      <aside class="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+       <div class="p-4 border-b border-gray-200">
+        <h2 id="company-name-sidebar" class="text-2xl font-bold text-gray-900 mb-4" style="color: #202124;">Dana Group</h2>
+       </div>
+       <nav class="flex-1 p-3 overflow-y-auto space-y-1">
+        <button onclick="switchIntranetTab('dashboard', event)" class="intranet-tab-link active w-full flex items-center gap-3 px-3 py-2 rounded-r-full text-gray-900 bg-transparent border-none cursor-pointer text-left">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+         </svg><span class="flex-1 text-sm font-medium">Dashboard</span> </button> <button onclick="switchIntranetTab('chats', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+         </svg><span class="flex-1 text-sm">Chats &amp; Events</span> </button> <button onclick="switchIntranetTab('calendar', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
+         </svg><span class="flex-1 text-sm">Calendar</span> </button> <button onclick="switchIntranetTab('posts', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.3-1.54L6.5 17h11l-3.54-4.71z" />
+         </svg><span class="flex-1 text-sm">Posts</span> </button> <button onclick="switchIntranetTab('hr', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+         </svg><span class="flex-1 text-sm">HR Tools</span> </button> <button onclick="switchIntranetTab('email-login', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+         </svg><span class="flex-1 text-sm">Email Login</span> </button> <button onclick="switchIntranetTab('dms', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+         </svg><span class="flex-1 text-sm">DMS</span> </button> <button onclick="switchIntranetTab('asset', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+         </svg><span class="flex-1 text-sm">Asset Portal</span> </button> <button onclick="switchIntranetTab('sop', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-8-6z" />
+         </svg><span class="flex-1 text-sm">SOP Portal</span> </button> <button onclick="switchIntranetTab('hmo', event)" class="intranet-tab-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full bg-transparent border-none cursor-pointer text-left" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.3-1.54L6.5 17h11l-3.54-4.71z" />
+         </svg><span class="flex-1 text-sm">HMO Portal</span> </button>
+       </nav>
+      </aside><!-- Intranet Main Content -->
+      <main class="flex-1 flex min-w-0 overflow-hidden bg-white">
+       <!-- Content List Pane -->
+       <div id="intranet-content-pane" class="flex-1 overflow-y-auto min-w-0 flex flex-col" style="flex: 1;">
+        <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+         <div class="flex-1 flex items-center gap-4"><input type="text" id="search-intranet" placeholder="Search..." class="flex-1 max-w-md bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-gray-400 transition-all" style="color: #3c4043;">
+         </div><button onclick="toggleIntranetSplitPane()" class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" title="Split pane">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4H5a2 2 0 00-2 2v14a2 2 0 002 2h4m0-16v16m0-16h10a2 2 0 012 2v14a2 2 0 01-2 2h-10m0-16v16" />
+          </svg></button>
+        </header>
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+         <!-- Tab Contents -->
+         <div id="dashboard-tab" class="space-y-8">
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-lg">
+           <p class="text-lg font-semibold">Welcome Cosmas! 👋</p>
+           <p class="text-sm text-blue-100 mt-1">Great to see you back on the dashboard today</p>
+          </div>
+          <h2 id="dashboard_title" class="text-2xl font-bold text-gray-900 mb-6">Dashboard</h2><!-- KPI Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+           <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-5 hover:shadow-lg transition-shadow">
+            <div class="flex items-start justify-between">
+             <div>
+              <p class="text-gray-600 text-sm font-medium">Active Employees</p>
+              <p class="text-3xl font-bold text-blue-600 mt-2">248</p>
+              <p class="text-xs text-green-600 mt-2">↑ 2 new hires this week</p>
+             </div>
+             <div class="text-3xl">
+              👥
+             </div>
+            </div>
+           </div>
+           <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-5 hover:shadow-lg transition-shadow">
+            <div class="flex items-start justify-between">
+             <div>
+              <p class="text-gray-600 text-sm font-medium">Online Now</p>
+              <p class="text-3xl font-bold text-green-600 mt-2">156</p>
+              <p class="text-xs text-gray-600 mt-2">Currently active</p>
+             </div>
+             <div class="text-3xl">
+              🟢
+             </div>
+            </div>
+           </div>
+           <div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-5 hover:shadow-lg transition-shadow">
+            <div class="flex items-start justify-between">
+             <div>
+              <p class="text-gray-600 text-sm font-medium">Upcoming Birthdays</p>
+              <p class="text-3xl font-bold text-purple-600 mt-2">3</p>
+              <p class="text-xs text-gray-600 mt-2">This month</p>
+             </div>
+             <div class="text-3xl">
+              🎂
+             </div>
+            </div>
+           </div>
+           <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-5 hover:shadow-lg transition-shadow">
+            <div class="flex items-start justify-between">
+             <div>
+              <p class="text-gray-600 text-sm font-medium">New Joiners</p>
+              <p class="text-3xl font-bold text-orange-600 mt-2">5</p>
+              <p class="text-xs text-gray-600 mt-2">Q1 2024</p>
+             </div>
+             <div class="text-3xl">
+              🆕
+             </div>
+            </div>
+           </div>
+          </div><!-- Charts & Analytics Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><!-- Activity Chart -->
+           <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">January Calendar</h3>
+            <div class="grid grid-cols-7 gap-2 mb-4">
+             <div class="text-center text-xs font-semibold text-gray-600">
+              Sun
+             </div>
+             <div class="text-center text-xs font-semibold text-gray-600">
+              Mon
+             </div>
+             <div class="text-center text-xs font-semibold text-gray-600">
+              Tue
+             </div>
+             <div class="text-center text-xs font-semibold text-gray-600">
+              Wed
+             </div>
+             <div class="text-center text-xs font-semibold text-gray-600">
+              Thu
+             </div>
+             <div class="text-center text-xs font-semibold text-gray-600">
+              Fri
+             </div>
+             <div class="text-center text-xs font-semibold text-gray-600">
+              Sat
+             </div>
+            </div>
+            <div class="grid grid-cols-7 gap-2">
+             <div class="text-center text-sm text-gray-400 p-2">
+              31
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              1
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              2
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              3
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              4
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              5
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              6
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              7
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              8
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              9
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              10
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              11
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              12
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              13
+             </div>
+             <div class="text-center text-sm font-bold p-2 rounded bg-blue-600 text-white">
+              14
+             </div>
+             <div class="text-center text-sm p-2 rounded bg-red-100 text-red-700 font-medium">
+              15
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              16
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              17
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              18
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              19
+             </div>
+             <div class="text-center text-sm p-2 rounded bg-yellow-100 text-yellow-700 font-medium">
+              20
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              21
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              22
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              23
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              24
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              25
+             </div>
+             <div class="text-center text-sm p-2 rounded bg-green-100 text-green-700 font-medium">
+              26
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              27
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              28
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              29
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              30
+             </div>
+             <div class="text-center text-sm p-2 rounded hover:bg-blue-100 cursor-pointer">
+              31
+             </div>
+             <div class="text-center text-sm text-gray-400 p-2">
+              1
+             </div>
+             <div class="text-center text-sm text-gray-400 p-2">
+              2
+             </div>
+            </div>
+           </div><!-- Department Stats -->
+           <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Department Distribution</h3><!-- Active Users Section -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+             <h3 class="text-lg font-semibold text-gray-900 mb-4">Active Users Online 🟢</h3>
+             <div class="flex flex-wrap gap-3">
+              <div class="flex items-center gap-2">
+               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
+                SM
+               </div>
+               <div class="flex-1">
+                <p class="text-xs font-medium text-gray-900">Sarah Mitchell</p>
+                <p class="text-xs text-green-600">Now</p>
+               </div>
+              </div>
+              <div class="flex items-center gap-2">
+               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white text-xs font-bold">
+                JW
+               </div>
+               <div class="flex-1">
+                <p class="text-xs font-medium text-gray-900">James Wilson</p>
+                <p class="text-xs text-green-600">2m ago</p>
+               </div>
+              </div>
+              <div class="flex items-center gap-2">
+               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
+                EM
+               </div>
+               <div class="flex-1">
+                <p class="text-xs font-medium text-gray-900">Emily Martinez</p>
+                <p class="text-xs text-green-600">5m ago</p>
+               </div>
+              </div>
+              <div class="flex items-center gap-2">
+               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold">
+                DP
+               </div>
+               <div class="flex-1">
+                <p class="text-xs font-medium text-gray-900">David Parker</p>
+                <p class="text-xs text-green-600">7m ago</p>
+               </div>
+              </div>
+              <div class="flex items-center gap-2">
+               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                RS
+               </div>
+               <div class="flex-1">
+                <p class="text-xs font-medium text-gray-900">Rachel Singh</p>
+                <p class="text-xs text-green-600">10m ago</p>
+               </div>
+              </div>
+              <div class="flex items-center gap-2">
+               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white text-xs font-bold">
+                MK
+               </div>
+               <div class="flex-1">
+                <p class="text-xs font-medium text-gray-900">Marcus Kim</p>
+                <p class="text-xs text-green-600">12m ago</p>
+               </div>
+              </div>
+             </div>
+            </div>
+            <div class="flex items-center justify-between">
+             <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-blue-500"></div><span class="text-sm text-gray-700">Engineering</span>
+             </div><span class="text-sm font-semibold text-gray-900">58</span>
+            </div>
+            <div class="flex items-center justify-between">
+             <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-green-500"></div><span class="text-sm text-gray-700">Design</span>
+             </div><span class="text-sm font-semibold text-gray-900">32</span>
+            </div>
+            <div class="flex items-center justify-between">
+             <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-purple-500"></div><span class="text-sm text-gray-700">Marketing</span>
+             </div><span class="text-sm font-semibold text-gray-900">45</span>
+            </div>
+            <div class="flex items-center justify-between">
+             <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-orange-500"></div><span class="text-sm text-gray-700">HR</span>
+             </div><span class="text-sm font-semibold text-gray-900">28</span>
+            </div>
+            <div class="flex items-center justify-between">
+             <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-pink-500"></div><span class="text-sm text-gray-700">Operations</span>
+             </div><span class="text-sm font-semibold text-gray-900">47</span>
+            </div>
+           </div>
+          </div>
+         </div><!-- Birthdays & Events Section Side by Side -->
+         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><!-- Birthdays Section -->
+          <div class="bg-white border border-gray-200 rounded-lg p-6">
+           <h3 class="text-lg font-semibold text-gray-900 mb-4">Upcoming Birthdays 🎂</h3>
+           <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-purple-50 border border-purple-200 rounded">
+             <div class="flex items-center gap-2 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+               SM
+              </div>
+              <div class="min-w-0">
+               <p class="font-semibold text-gray-900 text-sm truncate">Sarah Mitchell</p>
+               <p class="text-xs text-gray-600">Jan 15</p>
+              </div>
+             </div><button class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded hover:bg-purple-200 flex-shrink-0">Wish</button>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-300 rounded ring-2 ring-yellow-400">
+             <div class="flex items-center gap-2 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-amber-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+               CK
+              </div>
+              <div class="min-w-0">
+               <p class="font-semibold text-gray-900 text-sm truncate">Cosmas 🎉</p>
+               <p class="text-xs text-yellow-700 font-medium">Today!</p>
+              </div>
+             </div><button class="px-2 py-1 bg-yellow-200 text-yellow-800 text-xs font-medium rounded hover:bg-yellow-300 flex-shrink-0">Wish</button>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-pink-50 border border-pink-200 rounded">
+             <div class="flex items-center gap-2 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+               JJ
+              </div>
+              <div class="min-w-0">
+               <p class="font-semibold text-gray-900 text-sm truncate">James Johnson</p>
+               <p class="text-xs text-gray-600">Jan 22</p>
+              </div>
+             </div><button class="px-2 py-1 bg-pink-100 text-pink-700 text-xs font-medium rounded hover:bg-pink-200 flex-shrink-0">Wish</button>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-rose-50 border border-rose-200 rounded">
+             <div class="flex items-center gap-2 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+               EM
+              </div>
+              <div class="min-w-0">
+               <p class="font-semibold text-gray-900 text-sm truncate">Emily Martinez</p>
+               <p class="text-xs text-gray-600">Jan 28</p>
+              </div>
+             </div><button class="px-2 py-1 bg-rose-100 text-rose-700 text-xs font-medium rounded hover:bg-rose-200 flex-shrink-0">Wish</button>
+            </div>
+           </div>
+          </div><!-- Upcoming Events Section -->
+          <div class="bg-white border border-gray-200 rounded-lg p-6">
+           <h3 class="text-lg font-semibold text-gray-900 mb-4">Upcoming Events 📅</h3>
+           <div class="space-y-3">
+            <div class="flex gap-3 p-3 bg-red-50 border border-red-100 rounded">
+             <div class="bg-red-200 rounded px-2 py-1 text-xs font-bold text-red-800 h-fit flex-shrink-0">
+              JAN 15
+             </div>
+             <div class="min-w-0">
+              <p class="font-semibold text-gray-900 text-sm">Q1 All-Hands</p>
+              <p class="text-xs text-gray-600 truncate">Room A - 10:00 AM</p>
+             </div>
+            </div>
+            <div class="flex gap-3 p-3 bg-yellow-50 border border-yellow-100 rounded">
+             <div class="bg-yellow-200 rounded px-2 py-1 text-xs font-bold text-yellow-800 h-fit flex-shrink-0">
+              JAN 20
+             </div>
+             <div class="min-w-0">
+              <p class="font-semibold text-gray-900 text-sm">Team Building</p>
+              <p class="text-xs text-gray-600 truncate">Off-site - 2:00 PM</p>
+             </div>
+            </div>
+            <div class="flex gap-3 p-3 bg-green-50 border border-green-100 rounded">
+             <div class="bg-green-200 rounded px-2 py-1 text-xs font-bold text-green-800 h-fit flex-shrink-0">
+              JAN 25
+             </div>
+             <div class="min-w-0">
+              <p class="font-semibold text-gray-900 text-sm">Performance Reviews</p>
+              <p class="text-xs text-gray-600 truncate">Throughout week</p>
+             </div>
+            </div>
+            <div class="flex gap-3 p-3 bg-blue-50 border border-blue-100 rounded">
+             <div class="bg-blue-200 rounded px-2 py-1 text-xs font-bold text-blue-800 h-fit flex-shrink-0">
+              FEB 01
+             </div>
+             <div class="min-w-0">
+              <p class="font-semibold text-gray-900 text-sm">Product Launch</p>
+              <p class="text-xs text-gray-600 truncate">Main Office - 4:00 PM</p>
+             </div>
+            </div>
+           </div>
+          </div>
+         </div><!-- New Joiners and Posts Grid -->
+         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><!-- New Joiners Section -->
+          <div class="bg-white border border-gray-200 rounded-lg p-6">
+           <h3 class="text-lg font-semibold text-gray-900 mb-4">New Team Members 🆕</h3>
+           <div class="space-y-3">
+            <div class="flex items-start justify-between p-3 bg-orange-50 border border-orange-200 rounded">
+             <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+               DP
+              </div>
+              <div class="flex-1 min-w-0">
+               <p class="font-semibold text-gray-900 text-sm truncate">David Parker</p>
+               <p class="text-xs text-gray-600">Software Engineer</p>
+               <p class="text-xs text-orange-600 font-medium mt-1">Jan 8</p>
+              </div>
+             </div><button class="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded hover:bg-orange-200 flex-shrink-0">Welcome</button>
+            </div>
+            <div class="flex items-start justify-between p-3 bg-blue-50 border border-blue-200 rounded">
+             <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+               RS
+              </div>
+              <div class="flex-1 min-w-0">
+               <p class="font-semibold text-gray-900 text-sm truncate">Rachel Singh</p>
+               <p class="text-xs text-gray-600">Product Designer</p>
+               <p class="text-xs text-blue-600 font-medium mt-1">Jan 10</p>
+              </div>
+             </div><button class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded hover:bg-blue-200 flex-shrink-0">Welcome</button>
+            </div>
+            <div class="flex items-start justify-between p-3 bg-green-50 border border-green-200 rounded">
+             <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+               MK
+              </div>
+              <div class="flex-1 min-w-0">
+               <p class="font-semibold text-gray-900 text-sm truncate">Marcus Kim</p>
+               <p class="text-xs text-gray-600">Sales Manager</p>
+               <p class="text-xs text-green-600 font-medium mt-1">Jan 12</p>
+              </div>
+             </div><button class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded hover:bg-green-200 flex-shrink-0">Welcome</button>
+            </div>
+            <div class="flex items-start justify-between p-3 bg-indigo-50 border border-indigo-200 rounded">
+             <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+               LC
+              </div>
+              <div class="flex-1 min-w-0">
+               <p class="font-semibold text-gray-900 text-sm truncate">Lisa Chen</p>
+               <p class="text-xs text-gray-600">Marketing Specialist</p>
+               <p class="text-xs text-indigo-600 font-medium mt-1">Jan 14</p>
+              </div>
+             </div><button class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded hover:bg-indigo-200 flex-shrink-0">Welcome</button>
+            </div>
+           </div>
+          </div><!-- Team Updates/Posts -->
+          <div class="bg-white border border-gray-200 rounded-lg p-6">
+           <h3 class="text-lg font-semibold text-gray-900 mb-4">Team Updates 📢</h3>
+           <div class="space-y-3">
+            <div class="border-l-4 border-blue-500 pl-3 py-2">
+             <div class="flex items-start justify-between mb-1">
+              <p class="font-semibold text-gray-900 text-xs">Sarah Mitchell</p><span class="text-xs text-gray-500">2h ago</span>
+             </div>
+             <p class="text-gray-700 text-xs">Q1 product roadmap is live! 🚀</p><span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded mt-1">#ProductLaunch</span>
+            </div>
+            <div class="border-l-4 border-green-500 pl-3 py-2">
+             <div class="flex items-start justify-between mb-1">
+              <p class="font-semibold text-gray-900 text-xs">James Wilson</p><span class="text-xs text-gray-500">Yesterday</span>
+             </div>
+             <p class="text-gray-700 text-xs">Update your team profiles for the directory</p>
+            </div>
+            <div class="border-l-4 border-orange-500 pl-3 py-2">
+             <div class="flex items-start justify-between mb-1">
+              <p class="font-semibold text-gray-900 text-xs">Emily Johnson</p><span class="text-xs text-gray-500">2d ago</span>
+             </div>
+             <p class="text-gray-700 text-xs">150+ projects completed! 🎉</p><span class="inline-block bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded mt-1">#TeamWork</span>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div><!-- Chats & Events Tab -->
+       <div id="chats-tab" class="hidden space-y-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Chats &amp; Events</h2>
+        <div class="space-y-4">
+         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex gap-3">
+           <div class="text-2xl">
+            💬
+           </div>
+           <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">General Channel</h3>
+            <p class="text-sm text-gray-600 mt-1">Sarah: Great work on the new project!</p>
+            <p class="text-xs text-gray-500 mt-2">2 hours ago</p>
+           </div>
+          </div>
+         </div>
+         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex gap-3">
+           <div class="text-2xl">
+            🎉
+           </div>
+           <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">Team Celebration - James's Birthday</h3>
+            <p class="text-sm text-gray-600 mt-1">Join us in celebrating! 🎂</p>
+            <p class="text-xs text-gray-500 mt-2">Tomorrow at 3:00 PM</p>
+           </div>
+          </div>
+         </div>
+         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex gap-3">
+           <div class="text-2xl">
+            📢
+           </div>
+           <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">Engineering Updates</h3>
+            <p class="text-sm text-gray-600 mt-1">Michael: Q1 roadmap review scheduled</p>
+            <p class="text-xs text-gray-500 mt-2">1 day ago</p>
+           </div>
+          </div>
+         </div>
+         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex gap-3">
+           <div class="text-2xl">
+            🏆
+           </div>
+           <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">Employee Recognition Program</h3>
+            <p class="text-sm text-gray-600 mt-1">Emma recognized for outstanding service</p>
+            <p class="text-xs text-gray-500 mt-2">3 days ago</p>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div><!-- Calendar Tab -->
+       <div id="calendar-tab" class="hidden space-y-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Calendar</h2>
+        <div class="space-y-4">
+         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+           <div class="bg-red-200 rounded px-2 py-1 text-sm font-bold text-red-800">
+            JAN 15
+           </div>
+           <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">Q1 All-Hands Meeting</h3>
+            <p class="text-sm text-gray-600 mt-1">Conference Room A - 10:00 AM</p>
+            <p class="text-xs text-gray-500 mt-2">Presenter: Sarah Mitchell</p>
+           </div>
+          </div>
+         </div>
+         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+           <div class="bg-yellow-200 rounded px-2 py-1 text-sm font-bold text-yellow-800">
+            JAN 20
+           </div>
+           <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">Team Building Activity</h3>
+            <p class="text-sm text-gray-600 mt-1">Off-site Location - 2:00 PM</p>
+            <p class="text-xs text-gray-500 mt-2">Outdoor team games and BBQ</p>
+           </div>
+          </div>
+         </div>
+         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+           <div class="bg-green-200 rounded px-2 py-1 text-sm font-bold text-green-800">
+            JAN 25
+           </div>
+           <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">Performance Reviews Begin</h3>
+            <p class="text-sm text-gray-600 mt-1">Scheduled throughout the week</p>
+            <p class="text-xs text-gray-500 mt-2">HR Department</p>
+           </div>
+          </div>
+         </div>
+         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+           <div class="bg-blue-200 rounded px-2 py-1 text-sm font-bold text-blue-800">
+            FEB 01
+           </div>
+           <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">Product Launch Celebration</h3>
+            <p class="text-sm text-gray-600 mt-1">Main Office - 4:00 PM</p>
+            <p class="text-xs text-gray-500 mt-2">New product announcement party</p>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div><!-- Posts Tab -->
+       <div id="posts-tab" class="hidden space-y-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Posts</h2>
+        <div class="space-y-4">
+         <div class="bg-white border border-gray-200 rounded-lg p-4">
+          <div class="flex items-start gap-3 mb-3">
+           <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-sm font-bold">
+            SM
+           </div>
+           <div class="flex-1">
+            <p class="font-semibold text-gray-900">Sarah Mitchell</p>
+            <p class="text-xs text-gray-500">2 hours ago</p>
+           </div>
+          </div>
+          <p class="text-gray-700">Excited to share that our Q1 product roadmap is now available! Check out the new features we're shipping this quarter. Great work to the entire team! 🚀</p>
+          <div class="mt-3 flex gap-2"><span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">#ProductLaunch</span> <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">#Exciting</span>
+          </div>
+         </div>
+         <div class="bg-white border border-gray-200 rounded-lg p-4">
+          <div class="flex items-start gap-3 mb-3">
+           <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white text-sm font-bold">
+            JW
+           </div>
+           <div class="flex-1">
+            <p class="font-semibold text-gray-900">James Wilson</p>
+            <p class="text-xs text-gray-500">Yesterday</p>
+           </div>
+          </div>
+          <p class="text-gray-700">Reminder: Please update your team profiles with the latest information. This helps us keep our internal directory current and improves communication across teams.</p>
+          <div class="mt-3 flex gap-2"><span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">#Reminder</span>
+          </div>
+         </div>
+         <div class="bg-white border border-gray-200 rounded-lg p-4">
+          <div class="flex items-start gap-3 mb-3">
+           <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-sm font-bold">
+            EJ
+           </div>
+           <div class="flex-1">
+            <p class="font-semibold text-gray-900">Emily Johnson</p>
+            <p class="text-xs text-gray-500">2 days ago</p>
+           </div>
+          </div>
+          <p class="text-gray-700">Celebrating our team's achievement! We've successfully completed 150+ projects this month. Thank you all for your dedication and hard work! 🎉</p>
+          <div class="mt-3 flex gap-2"><span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">#Celebration</span> <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">#TeamWork</span>
+          </div>
+         </div>
+        </div>
+       </div><!-- HR Tools Tab - Login Page -->
+       <div id="hr-tab" class="hidden space-y-6">
+        <div class="max-w-md mx-auto bg-white border border-gray-200 rounded-lg p-8 mt-12">
+         <div class="text-center mb-6">
+          <div class="text-5xl mb-3">
+           👥
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">HR Tools</h2>
+          <p class="text-gray-600 mt-2">Manage your employment records</p>
+         </div>
+         <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Employee ID</label> <input type="text" placeholder="EMP-001234" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" placeholder="••••••••" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded transition-colors text-sm">Sign In</button>
+          <p class="text-xs text-gray-600 text-center mt-4"><a href="#" class="text-blue-600 hover:text-blue-700">Forgot credentials?</a></p>
+         </form>
+        </div>
+       </div><!-- Email Login Tab -->
+       <div id="email-login-tab" class="hidden space-y-6">
+        <div class="max-w-md mx-auto bg-white border border-gray-200 rounded-lg p-8 mt-12">
+         <div class="text-center mb-6">
+          <div class="text-5xl mb-3">
+           📧
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">Email Portal</h2>
+          <p class="text-gray-600 mt-2">Login to continue</p>
+         </div>
+         <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label> <input type="email" placeholder="your.email@company.com" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" placeholder="••••••••" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded transition-colors text-sm">Sign In</button>
+          <p class="text-xs text-gray-600 text-center mt-4"><a href="#" class="text-blue-600 hover:text-blue-700">Forgot password?</a></p>
+         </form>
+        </div>
+       </div><!-- DMS Tab - Login Page -->
+       <div id="dms-tab" class="hidden space-y-6">
+        <div class="max-w-md mx-auto bg-white border border-gray-200 rounded-lg p-8 mt-12">
+         <div class="text-center mb-6">
+          <div class="text-5xl mb-3">
+           📄
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">Document Management System</h2>
+          <p class="text-gray-600 mt-2">Welcome to DMS. Login to continue</p>
+         </div>
+         <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Username</label> <input type="text" placeholder="your.username" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" placeholder="••••••••" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded transition-colors text-sm">Sign In</button>
+          <p class="text-xs text-gray-600 text-center mt-4"><a href="#" class="text-blue-600 hover:text-blue-700">Forgot password?</a></p>
+         </form>
+        </div>
+       </div><!-- Asset Portal Tab - Login Page -->
+       <div id="asset-tab" class="hidden space-y-6">
+        <div class="max-w-md mx-auto bg-white border border-gray-200 rounded-lg p-8 mt-12">
+         <div class="text-center mb-6">
+          <div class="text-5xl mb-3">
+           💼
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">Asset Portal</h2>
+          <p class="text-gray-600 mt-2">Track and manage company assets</p>
+         </div>
+         <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Employee ID</label> <input type="text" placeholder="EMP-001234" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" placeholder="••••••••" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded transition-colors text-sm">Sign In</button>
+          <p class="text-xs text-gray-600 text-center mt-4"><a href="#" class="text-blue-600 hover:text-blue-700">Forgot credentials?</a></p>
+         </form>
+        </div>
+       </div><!-- SOP Portal Tab - Login Page -->
+       <div id="sop-tab" class="hidden space-y-6">
+        <div class="max-w-md mx-auto bg-white border border-gray-200 rounded-lg p-8 mt-12">
+         <div class="text-center mb-6">
+          <div class="text-5xl mb-3">
+           📋
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">SOP Portal</h2>
+          <p class="text-gray-600 mt-2">Access standard operating procedures</p>
+         </div>
+         <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Username</label> <input type="text" placeholder="your.username" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" placeholder="••••••••" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded transition-colors text-sm">Sign In</button>
+          <p class="text-xs text-gray-600 text-center mt-4"><a href="#" class="text-blue-600 hover:text-blue-700">Forgot password?</a></p>
+         </form>
+        </div>
+       </div><!-- HMO Portal Tab - Login Page -->
+       <div id="hmo-tab" class="hidden space-y-6">
+        <div class="max-w-md mx-auto bg-white border border-gray-200 rounded-lg p-8 mt-12">
+         <div class="text-center mb-6">
+          <div class="text-5xl mb-3">
+           🏥
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">HMO Portal</h2>
+          <p class="text-gray-600 mt-2">Access your health and medical benefits</p>
+         </div>
+         <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Policy Number</label> <input type="text" placeholder="POL-001234" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label> <input type="date" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-600">
+          </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded transition-colors text-sm">Sign In</button>
+          <p class="text-xs text-gray-600 text-center mt-4"><a href="#" class="text-blue-600 hover:text-blue-700">Forgot credentials?</a></p>
+         </form>
+        </div>
+       </div>
+      </main>
+     </div>
+    </div>
+   </div>
+  </div><!-- Compose Modal -->
+  <div id="compose-modal" class="hidden fixed inset-0 z-50 flex items-end justify-end p-4">
+   <div class="compose-backdrop fixed inset-0 bg-black/20" onclick="closeCompose()"></div>
+   <div class="compose-window relative w-full max-w-2xl bg-white rounded-t-lg border border-gray-300 border-b-0 flex flex-col max-h-96 shadow-2xl">
+    <div class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+     <h2 class="text-sm font-semibold text-gray-900">Compose</h2><button onclick="closeCompose()" class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg></button>
+    </div>
+    <div class="p-6 space-y-4 max-h-80 overflow-y-auto flex-1"><input type="email" placeholder="To" class="w-full bg-transparent border-b border-gray-300 px-0 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:border-b-2 transition-colors"> <input type="text" placeholder="Subject" class="w-full bg-transparent border-b border-gray-300 px-0 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:border-b-2 transition-colors font-medium"> <textarea placeholder="Compose your message..." rows="6" class="w-full bg-transparent border-b border-gray-300 px-0 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:border-b-2 transition-colors resize-none"></textarea>
+    </div>
+    <div class="border-t border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0"><button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors" title="Attach files">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+      </svg></button>
+     <div class="flex gap-3"><button onclick="closeCompose()" class="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded transition-colors text-sm">Draft</button> <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded transition-colors text-sm">Send</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const allEmails = [
+      { from: 'Sarah Mitchell', email: 'sarah.mitchell@company.com', subject: 'Project update: Q1 roadmap and timeline', preview: 'Let me share the latest updates...', body: 'Hi there,\n\nI wanted to reach out with an update on our current projects for Q1. We\'ve made significant progress on the roadmap and I\'d love to discuss the timeline with you.\n\nKey points to discuss:\n• Feature A implementation status\n• Q1 budget allocation\n• Team resources needed\n\nLooking forward to connecting soon!\n\nBest regards,\nSarah', avatar: 'SM', color: 'from-purple-500 to-pink-500', unread: true, folder: 'inbox' },
+      { from: 'James Wilson', email: 'james.wilson@company.com', subject: 'Meeting notes from Monday\'s standup', preview: 'Here are the notes from our Monday standup...', body: 'Hi Team,\n\nAttached are the notes from our Monday standup. Key action items are:\n\n1. James to follow up on API integration\n2. Sarah to prepare Q1 presentation\n3. Team to review the new design system\n\nPlease let me know if you have any questions!\n\nRegards,\nJames', avatar: 'JW', color: 'from-blue-500 to-cyan-500', unread: false, folder: 'inbox' },
+      { from: 'Emily Johnson', email: 'emily.johnson@design.com', subject: 'Feedback on the design system proposal', preview: 'I\'ve reviewed your design system...', body: 'Hi,\n\nGreat work on the design system proposal! I\'ve gone through it thoroughly and here are my thoughts:\n\nStrengths:\n• Comprehensive component library\n• Good accessibility considerations\n\nAreas to improve:\n• Color palette could be more vibrant\n• Typography scale needs refinement\n\nLet\'s schedule a call to discuss!\n\nBest,\nEmily', avatar: 'EJ', color: 'from-green-500 to-emerald-500', unread: false, folder: 'inbox' },
+      { from: 'Michael Brown', email: 'michael.brown@client.com', subject: 'Client request: urgent site migration', preview: 'Our client needs to migrate...', body: 'Hi,\n\nUrgent: Our client needs to migrate their website to a new server within the next 2 weeks. They\'re concerned about downtime.\n\nCan we set up a meeting to discuss:\n• Migration strategy\n• Rollback plan\n• Testing requirements\n\nPlease let me know your availability!\n\nThanks,\nMichael', avatar: 'MB', color: 'from-orange-500 to-red-500', unread: false, folder: 'work' },
+      { from: 'Laura Thompson', email: 'laura.thompson@finance.com', subject: 'Re: Budget approval for next quarter', preview: 'Regarding the budget proposal...', body: 'Hi,\n\nI\'ve reviewed the budget proposal for Q2. Overall, it looks solid. A few notes:\n\n• Marketing budget: Approved ✓\n• Engineering budget: Pending executive review\n• Operations budget: Approved ✓\n\nI\'ll have the final approvals by end of week.\n\nBest regards,\nLaura', avatar: 'LT', color: 'from-pink-500 to-rose-500', unread: false, folder: 'personal' },
+    ];
+
+    const sentEmails = [
+      { from: 'You', email: 'you@company.com', subject: 'Re: Q1 Planning Session', preview: 'Thanks for sending over the documents...', body: 'Thanks for sending over the documents. I\'ve reviewed them and they look great. I\'ll have my feedback ready by Wednesday.\n\nBest,\nJohn', avatar: 'YO', color: 'from-blue-400 to-indigo-600', unread: false, folder: 'sent' },
+      { from: 'You', email: 'you@company.com', subject: 'Design System Update', preview: 'Here are the latest updates...', body: 'Hi team,\n\nHere are the latest updates to our design system. Please review and provide feedback.\n\nChanges include:\n• New color palette\n• Updated typography\n• New component library\n\nThanks,\nJohn', avatar: 'YO', color: 'from-blue-400 to-indigo-600', unread: false, folder: 'sent' },
+    ];
+
+    const trashEmails = [
+      { from: 'Old Campaign', email: 'campaign@promo.com', subject: '[OLD] Newsletter subscription', preview: 'You received this because...', body: 'This is an old promotional email that has been deleted.', avatar: 'OC', color: 'from-gray-500 to-gray-600', unread: false, folder: 'trash' },
+    ];
+
+    const emailData = {
+      inbox: allEmails.filter(e => e.folder === 'inbox'),
+      starred: allEmails.slice(0, 1),
+      sent: sentEmails,
+      drafts: [{ from: 'You', email: 'you@company.com', subject: '[DRAFT] Team Meeting Notes', preview: 'Notes from today\'s meeting...', body: 'Notes from today\'s meeting:\n\n- Discussed Q1 goals\n- Reviewed project timeline\n- Assigned action items\n\n[This is a draft]', avatar: 'YO', color: 'from-blue-400 to-indigo-600', unread: false, folder: 'drafts' }],
+      important: allEmails.slice(0, 1),
+      work: allEmails.filter(e => e.folder === 'work'),
+      personal: allEmails.filter(e => e.folder === 'personal'),
+      all: allEmails.concat(sentEmails),
+      spam: [],
+      trash: trashEmails,
+    };
+
+    let currentFolder = 'inbox';
+    let currentEmailIndex = null;
+    let splitPaneActive = false;
+    let intranetSplitPaneActive = false;
+    let isResizing = false;
+    let isIntranetResizing = false;
+    let resizeStart = 0;
+    let listPaneWidth = 0;
+    let currentIntranetTab = 'dashboard';
+
+    function setupEventsResizeListener() {
+      const emailList = document.getElementById('email-list');
+      emailList.innerHTML = '';
+      const emails = emailData[folder] || [];
+      
+      if (emails.length === 0) {
+        emailList.innerHTML = '<div class="p-8 text-center text-gray-500"><p>No emails in this folder</p></div>';
+        return;
+      }
+
+      emails.forEach((email, index) => {
+        const div = document.createElement('div');
+        div.className = `email-row ${email.unread ? 'unread' : ''} ${currentEmailIndex === index ? 'selected' : ''} px-6 py-4 cursor-pointer`;
+        div.onclick = () => selectEmail(folder, index);
+        
+        const subject = email.subject.includes('[DRAFT]') ? email.subject : (email.folder === 'sent' ? `[Sent] ${email.subject}` : email.subject);
+        
+        div.innerHTML = `
+          <div class="flex items-center gap-4">
+            <input type="checkbox" class="w-5 h-5 rounded border-gray-300 accent-blue-600">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${email.color} flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              ${email.avatar}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-gray-900 font-medium text-sm truncate">${email.from}</p>
+              <p class="text-sm text-gray-600 truncate">${subject}</p>
+            </div>
+            <div class="flex-shrink-0 text-right">
+              <p class="text-xs text-gray-600">2:45 PM</p>
+            </div>
+          </div>
+        `;
+        emailList.appendChild(div);
+      });
+    }
+
+    function switchFolder(folder, event) {
+      event.preventDefault();
+      currentFolder = folder;
+      currentEmailIndex = null;
+      
+      document.querySelectorAll('.folder-link').forEach(link => link.classList.remove('active'));
+      event.target.closest('.folder-link').classList.add('active');
+      
+      renderEmails(folder);
+      
+      if (splitPaneActive) {
+        document.getElementById('sender-info').innerHTML = '';
+        document.getElementById('email-subject').innerHTML = '';
+        document.getElementById('email-body').textContent = '';
+      }
+    }
+
+    function selectEmail(folder, index) {
+      currentEmailIndex = index;
+      const emails = emailData[folder] || [];
+      const email = emails[index];
+      if (!email) return;
+      
+      if (!splitPaneActive) {
+        splitPaneActive = true;
+        document.getElementById('detail-panel').classList.remove('hidden');
+        document.getElementById('resize-handle').classList.remove('hidden');
+        setupResizeListener();
+      }
+      
+      document.querySelectorAll('.email-row').forEach((row, i) => {
+        if (i === index) row.classList.add('selected');
+        else row.classList.remove('selected');
+      });
+      
+      document.getElementById('sender-info').innerHTML = `
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${email.color} flex items-center justify-center text-white text-sm font-semibold">
+              ${email.avatar}
+            </div>
+            <div>
+              <p class="text-gray-900 font-semibold text-sm">${email.from}</p>
+              <p class="text-xs text-gray-600">${email.email}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('email-subject').innerHTML = `<h3 class="text-lg font-bold text-gray-900">${email.subject}</h3>`;
+      document.getElementById('email-body').textContent = email.body;
+    }
+
+    function toggleSplitPane() {
+      if (!splitPaneActive) {
+        splitPaneActive = true;
+        document.getElementById('detail-panel').classList.remove('hidden');
+        document.getElementById('resize-handle').classList.remove('hidden');
+        
+        if (currentEmailIndex !== null) {
+          selectEmail(currentFolder, currentEmailIndex);
+        }
+        
+        setupResizeListener();
+      } else {
+        closeSplitPane();
+      }
+    }
+
+    function closeSplitPane() {
+      splitPaneActive = false;
+      document.getElementById('detail-panel').classList.add('hidden');
+      document.getElementById('resize-handle').classList.add('hidden');
+      document.removeEventListener('mousemove', onResize);
+      document.removeEventListener('mouseup', stopResize);
+    }
+
+    function setupResizeListener() {
+      const handle = document.getElementById('resize-handle');
+      handle.addEventListener('mousedown', startResize);
+    }
+
+    function startResize(e) {
+      isResizing = true;
+      resizeStart = e.clientX;
+      listPaneWidth = document.getElementById('email-list-pane').offsetWidth;
+      document.addEventListener('mousemove', onResize);
+      document.addEventListener('mouseup', stopResize);
+    }
+
+    function onResize(e) {
+      if (!isResizing) return;
+      const diff = e.clientX - resizeStart;
+      const newWidth = Math.max(300, listPaneWidth + diff);
+      document.getElementById('email-list-pane').style.flex = `0 0 ${newWidth}px`;
+    }
+
+    function stopResize() {
+      isResizing = false;
+      document.removeEventListener('mousemove', onResize);
+      document.removeEventListener('mouseup', stopResize);
+    }
+
+    function openCompose() {
+      document.getElementById('compose-modal').classList.remove('hidden');
+    }
+
+    function closeCompose() {
+      document.getElementById('compose-modal').classList.add('hidden');
+    }
+
+    // Intranet functions
+    function switchIntranetTab(tab, event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      currentIntranetTab = tab;
+      document.querySelectorAll('[id$="-tab"]').forEach(t => t.classList.add('hidden'));
+      document.getElementById(tab + '-tab').classList.remove('hidden');
+      
+      document.querySelectorAll('.intranet-tab-link').forEach(link => link.classList.remove('active'));
+      if (event) {
+        event.target.closest('.intranet-tab-link').classList.add('active');
+      } else {
+        document.querySelector(`[onclick*="switchIntranetTab('${tab}'"]`).classList.add('active');
+      }
+      
+      if (intranetSplitPaneActive) {
+        document.getElementById('intranet-detail-content').innerHTML = '';
+      }
+    }
+
+    function toggleIntranetSplitPane() {
+      if (!intranetSplitPaneActive) {
+        intranetSplitPaneActive = true;
+        document.getElementById('intranet-detail-panel').classList.remove('hidden');
+        document.getElementById('intranet-resize-handle').classList.remove('hidden');
+        setupIntranetResizeListener();
+      } else {
+        closeIntranetSplitPane();
+      }
+    }
+
+    function closeIntranetSplitPane() {
+      intranetSplitPaneActive = false;
+      document.getElementById('intranet-detail-panel').classList.add('hidden');
+      document.getElementById('intranet-resize-handle').classList.add('hidden');
+      document.removeEventListener('mousemove', onIntranetResize);
+      document.removeEventListener('mouseup', stopIntranetResize);
+    }
+
+    function setupIntranetResizeListener() {
+      const handle = document.getElementById('intranet-resize-handle');
+      handle.addEventListener('mousedown', startIntranetResize);
+    }
+
+    function startIntranetResize(e) {
+      isIntranetResizing = true;
+      resizeStart = e.clientX;
+      listPaneWidth = document.getElementById('intranet-content-pane').offsetWidth;
+      document.addEventListener('mousemove', onIntranetResize);
+      document.addEventListener('mouseup', stopIntranetResize);
+    }
+
+    function onIntranetResize(e) {
+      if (!isIntranetResizing) return;
+      const diff = e.clientX - resizeStart;
+      const newWidth = Math.max(300, listPaneWidth + diff);
+      document.getElementById('intranet-content-pane').style.flex = `0 0 ${newWidth}px`;
+    }
+
+    function stopIntranetResize() {
+      isIntranetResizing = false;
+      document.removeEventListener('mousemove', onIntranetResize);
+      document.removeEventListener('mouseup', stopIntranetResize);
+    }
+
+    function switchSection(section, event) {
+      event.preventDefault();
+      document.getElementById('gmail-section').classList.toggle('hidden', section !== 'gmail');
+      document.getElementById('intranet-section').classList.toggle('hidden', section !== 'intranet');
+      
+      document.querySelectorAll('.section-tab').forEach(tab => tab.classList.remove('active', 'border-red-500', 'border-blue-600'));
+      const activeBtn = event.target.closest('.section-tab');
+      activeBtn.classList.add('active');
+      if (section === 'gmail') {
+        activeBtn.classList.add('border-red-500');
+        activeBtn.style.color = '#c5221f';
+      } else {
+        activeBtn.classList.add('border-blue-600');
+        activeBtn.style.color = '#1f2937';
+      }
+    }
+
+    const defaultConfig = { company_name: 'Dana Group', dashboard_title: 'Dashboard', welcome_message: 'Welcome back!' };
+
+    async function onConfigChange(config) {
+      const companyName = config.company_name || defaultConfig.company_name;
+      const dashboardTitle = config.dashboard_title || defaultConfig.dashboard_title;
+      const welcomeMessage = config.welcome_message || defaultConfig.welcome_message;
+      
+      document.getElementById('company-name-header').textContent = companyName;
+      document.getElementById('company-name-sidebar').textContent = companyName;
+      document.getElementById('dashboard_title').textContent = dashboardTitle;
+      const welcomeEl = document.querySelector('.welcome-message-text');
+      if (welcomeEl) welcomeEl.textContent = welcomeMessage;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['company_name', config.company_name || defaultConfig.company_name],
+        ['dashboard_title', config.dashboard_title || defaultConfig.dashboard_title],
+        ['welcome_message', config.welcome_message || defaultConfig.welcome_message]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    renderEmails('inbox');
+ </body>
+</html></script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9daba37eb166c13d',t:'MTc3MzI0MzQyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

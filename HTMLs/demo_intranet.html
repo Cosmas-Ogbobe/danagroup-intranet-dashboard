@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Intranet Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+
+<aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
+
+<h2 class="text-xl font-semibold mb-8 flex items-center gap-2">
+<i data-lucide="layout-dashboard"></i> Intranet
+</h2>
+
+<nav class="space-y-3">
+
+<a class="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
+<i data-lucide="home"></i> Dashboard
+</a>
+
+<a class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+<i data-lucide="calendar"></i> Calendar
+</a>
+
+<a class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+<i data-lucide="umbrella"></i> Leaves
+</a>
+
+<a class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+<i data-lucide="video"></i> Meetings
+</a>
+
+<a class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+<i data-lucide="message-circle"></i> Messages
+</a>
+
+<a class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+<i data-lucide="calendar-days"></i> Events
+</a>
+
+<a class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+<i data-lucide="sticky-note"></i> Notes
+</a>
+
+</nav>
+
+</aside>
+
+<!-- MAIN -->
+
+<main class="flex-1 p-6">
+
+<!-- TOP BAR -->
+
+<div class="flex justify-between items-center mb-8">
+
+<div>
+<p class="text-gray-500">Welcome</p>
+<h1 class="text-xl font-semibold">Kerlos Eskander</h1>
+</div>
+
+<button class="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+<i data-lucide="plus"></i> Create Meeting
+</button>
+
+</div>
+
+<!-- GRID -->
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+<!-- LEAVE GAUGE -->
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<h3 class="font-semibold mb-4">Leaves</h3>
+
+<canvas id="leaveChart"></canvas>
+
+<p class="text-center text-gray-500 mt-3">14 of 21 used</p>
+
+</div>
+
+<!-- TEAM MESSAGES -->
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<h3 class="font-semibold mb-4">Team Messages</h3>
+
+<div class="space-y-4">
+
+<div class="flex items-center gap-3">
+
+<img src="https://i.pravatar.cc/40?img=1" class="rounded-full">
+
+<div class="flex-1">
+<p class="text-sm">Please send the new update</p>
+<span class="text-xs text-gray-400">03m</span>
+</div>
+
+</div>
+
+<div class="flex items-center gap-3">
+
+<img src="https://i.pravatar.cc/40?img=2" class="rounded-full">
+
+<div class="flex-1">
+<p class="text-sm">Hi, good morning ☀️</p>
+<span class="text-xs text-gray-400">12m</span>
+</div>
+
+</div>
+
+<div class="flex items-center gap-3">
+
+<img src="https://i.pravatar.cc/40?img=3" class="rounded-full">
+
+<div class="flex-1">
+<p class="text-sm">Did you receive my message?</p>
+<span class="text-xs text-gray-400">25m</span>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- CALENDAR -->
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<h3 class="font-semibold mb-4">Calendar</h3>
+
+<div class="grid grid-cols-7 text-center text-sm text-gray-500">
+
+<span>Su</span>
+<span>Mo</span>
+<span>Tu</span>
+<span>We</span>
+<span>Th</span>
+<span>Fr</span>
+<span>Sa</span>
+
+</div>
+
+<div class="grid grid-cols-7 gap-2 mt-3 text-center">
+
+<span></span>
+<span></span>
+<span class="p-2 rounded hover:bg-gray-100">20</span>
+<span class="p-2 rounded hover:bg-gray-100">21</span>
+
+<span class="p-2 bg-indigo-600 text-white rounded">22</span>
+
+<span class="p-2 rounded hover:bg-gray-100">23</span>
+<span class="p-2 rounded hover:bg-gray-100">24</span>
+
+</div>
+
+</div>
+
+<!-- EVENTS -->
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<h3 class="font-semibold mb-4">Events</h3>
+
+<div class="space-y-3">
+
+<div class="bg-gradient-to-r from-purple-400 to-indigo-500 text-white p-4 rounded-lg">
+ADDA's Yearly Ceremony
+</div>
+
+<div class="bg-gradient-to-r from-blue-400 to-cyan-500 text-white p-4 rounded-lg">
+Team Gathering Safari
+</div>
+
+</div>
+
+</div>
+
+<!-- NOTES -->
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<h3 class="font-semibold mb-4">Notes</h3>
+
+<ul class="space-y-3">
+
+<li class="flex items-center gap-2">
+<input type="checkbox">
+<span>Send email to Eman</span>
+</li>
+
+<li class="flex items-center gap-2">
+<input type="checkbox">
+<span>Finish design review</span>
+</li>
+
+<li class="flex items-center gap-2">
+<input type="checkbox">
+<span>Create new signature</span>
+</li>
+
+</ul>
+
+</div>
+
+<!-- MEETING CARDS -->
+
+<div class="bg-gradient-to-r from-yellow-200 to-orange-200 p-6 rounded-xl shadow">
+
+<p class="text-sm">In 30 mins</p>
+
+<h3 class="font-semibold">Design Sprint Meeting</h3>
+
+<p class="text-sm">9:00 - 9:30 AM</p>
+
+</div>
+
+<div class="bg-gradient-to-r from-indigo-200 to-purple-200 p-6 rounded-xl shadow">
+
+<p class="text-sm">Today</p>
+
+<h3 class="font-semibold">Employees All Hands</h3>
+
+<p class="text-sm">11:00 - 12:30 PM</p>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script>
+
+lucide.createIcons();
+
+const ctx = document.getElementById('leaveChart');
+
+new Chart(ctx, {
+
+type: 'doughnut',
+
+data: {
+
+labels: ['Used', 'Remaining'],
+
+datasets: [{
+
+data: [14,7],
+
+backgroundColor: [
+
+'#6366f1',
+'#e5e7eb'
+
+],
+
+borderWidth:0
+
+}]
+
+},
+
+options: {
+
+cutout: '75%',
+
+plugins: {
+legend: { display:false }
+}
+
+}
+
+});
+
+</script>
+
+</body>
+</html>

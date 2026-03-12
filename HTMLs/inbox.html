@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    * { font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif; }
+    html, body { background: #ffffff; }
+    .email-row { transition: background 0.15s ease; border-left: 3px solid transparent; }
+    .email-row:hover { background: #f5f5f5; }
+    .email-row.unread { background: #fef7e0; font-weight: 500; border-left-color: #f7b500; }
+    .email-row.selected { background: #f1f3f4; border-left-color: #1f2937; }
+    .folder-link { transition: all 0.2s ease; color: #5f6368; }
+    .folder-link:hover { background: #f1f3f4; color: #202124; }
+    .folder-link.active { background: #fce8e6; color: #c5221f; font-weight: 500; }
+    .compose-btn { transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+    .compose-btn:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); }
+    .compose-window { animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: 1px solid #ccc; }
+    .compose-backdrop { animation: fadeIn 0.3s ease-out; }
+    @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .email-content { line-height: 1.6; color: #3c4043; }
+    .resize-handle { cursor: col-resize; user-select: none; transition: background 0.2s ease; }
+    .resize-handle:hover { background: #e5e7eb; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-white text-gray-900 overflow-hidden">
+  <div class="flex h-full w-full"><!-- Top Navigation Tabs -->
+   <div class="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center gap-8 px-6 z-40">
+    <h1 id="app-title" class="text-xl font-bold text-gray-900" style="color: #202124; min-width: fit-content;">Gmail &amp; Intranet</h1>
+    <div class="flex gap-1 flex-1"><button onclick="switchSection('gmail', event)" class="section-tab active px-4 py-2 text-sm font-medium text-gray-900 border-b-2 border-red-500 transition-colors" style="color: #c5221f;">📧 Gmail</button> <button onclick="switchSection('intranet', event)" class="section-tab px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-900 transition-colors">🏢 Intranet</button>
+    </div>
+   </div>
+   <div class="flex h-full w-full pt-14"><!-- Gmail Section -->
+    <div id="gmail-section" class="flex h-full w-full"><!-- Sidebar -->
+     <aside class="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0"><!-- Header -->
+      <div class="p-4 border-b border-gray-200">
+       <h1 id="app-title" class="text-2xl font-bold text-gray-900 mb-4" style="color: #202124;">Gmail</h1><button onclick="openCompose()" class="compose-btn w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-full flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg> Compose </button>
+      </div><!-- Folders -->
+      <nav class="flex-1 p-3 overflow-y-auto space-y-0"><!-- Main Folders -->
+       <div class="space-y-1 mb-4"><a href="#" onclick="switchFolder('inbox', event)" class="folder-link active w-full flex items-center gap-3 px-3 py-2 rounded-r-full text-gray-900" style="color: #c5221f;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" />
+         </svg><span class="flex-1 text-sm font-medium">Inbox</span> <span class="text-xs bg-gray-300 text-gray-900 px-2 py-1 rounded-full font-medium" id="inbox-count">24</span> </a> <a href="#" onclick="switchFolder('starred', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M17 3H5c-1.11 0-1.99.9-1.99 2L3 21l9-4 9 4V5c0-1.1-.89-2-2-2z" />
+         </svg><span class="flex-1 text-sm">Starred</span> </a> <a href="#" onclick="switchFolder('sent', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M3 9h4V5H3v4zm0 5h4v-4H3v4zm5 0h4v-4H8v4zm5 0h4v-4h-4v4zm-10 5h4v-4H3v4zm5 0h4v-4H8v4zm5 0h4v-4h-4v4zm5-14v4h4V5h-4zm0 9h4v-4h-4v4z" />
+         </svg><span class="flex-1 text-sm">Sent</span> </a> <a href="#" onclick="switchFolder('drafts', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z" />
+         </svg><span class="flex-1 text-sm">Drafts</span> </a>
+       </div><!-- Labels Section -->
+       <div class="mt-4 pt-4 border-t border-gray-200">
+        <p class="px-3 py-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">Labels</p>
+        <div class="space-y-1"><a href="#" onclick="switchFolder('important', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+          <svg class="w-2 h-2 flex-shrink-0 rounded-full" fill="currentColor" style="background: #ea4335;"></svg><span class="flex-1 text-sm">Important</span> </a> <a href="#" onclick="switchFolder('work', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+          <svg class="w-2 h-2 flex-shrink-0 rounded-full" fill="currentColor" style="background: #4285f4;"></svg><span class="flex-1 text-sm">Work</span> </a> <a href="#" onclick="switchFolder('personal', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+          <svg class="w-2 h-2 flex-shrink-0 rounded-full" fill="currentColor" style="background: #34a853;"></svg><span class="flex-1 text-sm">Personal</span> </a>
+        </div>
+       </div><!-- More Labels -->
+       <div class="space-y-1 mt-4 pt-4 border-t border-gray-200"><a href="#" onclick="switchFolder('all', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+         </svg><span class="flex-1 text-sm">All Mail</span> </a> <a href="#" onclick="switchFolder('spam', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M3 6c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V6zm2 0v12h12V6H5z" />
+         </svg><span class="flex-1 text-sm">Spam</span> </a> <a href="#" onclick="switchFolder('trash', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z" />
+         </svg><span class="flex-1 text-sm">Trash</span> </a>
+       </div>
+      </nav>
+     </aside><!-- Main Content -->
+     <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-white" id="email-list-container"><!-- Toolbar -->
+      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+       <div class="flex-1 flex items-center gap-4"><input type="text" id="search-input" placeholder="Search emails..." class="flex-1 max-w-md bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-gray-400 transition-all" style="color: #3c4043;">
+       </div>
+       <div class="flex items-center gap-4"><button onclick="toggleSplitPane()" class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" title="Split pane">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4H5a2 2 0 00-2 2v14a2 2 0 002 2h4m0-16v16m0-16h10a2 2 0 012 2v14a2 2 0 01-2 2h-10m0-16v16" />
+         </svg></button> <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative" title="Notifications">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+         </svg><span class="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full"></span> </button>
+        <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+         <div class="text-right">
+          <p class="text-sm font-medium text-gray-900">JD</p>
+          <p class="text-xs text-gray-600">john@email.com</p>
+         </div>
+         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 flex items-center justify-center text-white text-sm font-semibold">
+          JD
+         </div>
+        </div>
+       </div>
+      </header><!-- Email List & Detail Split View -->
+      <div class="flex-1 flex min-w-0 overflow-hidden"><!-- Email List -->
+       <div id="email-list-pane" class="flex-1 overflow-y-auto min-w-0" style="flex: 1;">
+        <div class="divide-y divide-gray-200" id="email-list"><!-- Email rows populated by JS -->
+        </div>
+       </div><!-- Resize Handle -->
+       <div id="resize-handle" class="resize-handle w-1 bg-gray-200 hidden"></div><!-- Email Detail Panel -->
+       <div id="detail-panel" class="hidden w-96 bg-white border-l border-gray-200 flex flex-col flex-shrink-0 overflow-hidden" style="flex: 0 0 384px;">
+        <div class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+         <h2 class="text-lg font-semibold text-gray-900">Details</h2><button onclick="closeSplitPane()" class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+         <div id="sender-info"></div>
+         <div id="email-subject"></div>
+         <div id="email-body" class="email-content"></div>
+         <div class="flex gap-3"><button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l-6 6" />
+           </svg> Reply </button> <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l-6 6" />
+           </svg> Forward </button>
+         </div>
+        </div>
+       </div>
+      </div>
+     </main>
+    </div><!-- Intranet Section -->
+    <div id="intranet-section" class="hidden h-full w-full flex flex-col"><!-- Intranet Sidebar -->
+     <aside class="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+      <div class="p-4 border-b border-gray-200">
+       <h2 id="company-name" class="text-2xl font-bold text-gray-900 mb-4" style="color: #202124;">Acme Corp</h2><button onclick="openAnnouncement()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg> Post Update </button>
+      </div>
+      <nav class="flex-1 p-3 overflow-y-auto space-y-0">
+       <div class="space-y-1"><a href="#" onclick="switchIntranetTab('announcements', event)" class="folder-link active w-full flex items-center gap-3 px-3 py-2 rounded-r-full text-gray-900" style="color: #1f2937;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M21 16V8c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-11-7h6v6h-6v-6z" />
+         </svg><span class="flex-1 text-sm font-medium">Announcements</span> </a> <a href="#" onclick="switchIntranetTab('directory', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+         </svg><span class="flex-1 text-sm">Directory</span> </a> <a href="#" onclick="switchIntranetTab('documents', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-8-6z" />
+         </svg><span class="flex-1 text-sm">Documents</span> </a> <a href="#" onclick="switchIntranetTab('teams', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
+         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+         </svg><span class="flex-1 text-sm">Teams</span> </a>
+       </div>
+      </nav>
+     </aside><!-- Intranet Main Content -->
+     <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
+      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+       <div class="flex-1 flex items-center gap-4"><input type="text" placeholder="Search intranet..." class="flex-1 max-w-md bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-gray-400 transition-all" style="color: #3c4043;">
+       </div>
+       <div class="flex items-center gap-4"><button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" title="Settings">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+         </svg></button>
+       </div>
+      </header>
+      <div class="flex-1 overflow-y-auto p-6"><!-- Announcements Tab -->
+       <div id="announcements-tab" class="space-y-4">
+        <h2 id="announcement_title" class="text-2xl font-bold text-gray-900 mb-6">Latest Company Updates</h2>
+        <div id="announcements-list" class="space-y-4"><!-- Announcements populated by JS -->
+        </div>
+       </div><!-- Directory Tab -->
+       <div id="directory-tab" class="hidden">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Employee Directory</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="directory-list"><!-- Directory populated by JS -->
+        </div>
+       </div><!-- Documents Tab -->
+       <div id="documents-tab" class="hidden">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Company Documents</h2>
+        <div class="space-y-3" id="documents-list"><!-- Documents populated by JS -->
+        </div>
+       </div><!-- Teams Tab -->
+       <div id="teams-tab" class="hidden">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Teams</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="teams-list"><!-- Teams populated by JS -->
+        </div>
+       </div>
+      </div>
+     </main>
+    </div>
+   </div><!-- Compose Modal -->
+   <div id="compose-modal" class="hidden fixed inset-0 z-50 flex items-end justify-end p-4">
+    <div class="compose-backdrop fixed inset-0 bg-black/20" onclick="closeCompose()"></div>
+    <div class="compose-window relative w-full max-w-2xl bg-white rounded-t-lg border border-gray-300 border-b-0 flex flex-col max-h-96 shadow-2xl">
+     <div class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+      <h2 class="text-sm font-semibold text-gray-900">Compose</h2><button onclick="closeCompose()" class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+       </svg></button>
+     </div>
+     <div class="p-6 space-y-4 max-h-80 overflow-y-auto flex-1"><input type="email" placeholder="To" class="w-full bg-transparent border-b border-gray-300 px-0 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:border-b-2 transition-colors"> <input type="text" placeholder="Subject" class="w-full bg-transparent border-b border-gray-300 px-0 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:border-b-2 transition-colors font-medium"> <textarea placeholder="Compose your message..." rows="6" class="w-full bg-transparent border-b border-gray-300 px-0 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-600 focus:border-b-2 transition-colors resize-none"></textarea>
+     </div>
+     <div class="border-t border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0"><button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors" title="Attach files">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+       </svg></button>
+      <div class="flex gap-3"><button onclick="closeCompose()" class="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded transition-colors text-sm">Draft</button> <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded transition-colors text-sm">Send</button>
+      </div>
+     </div>
+    </div>
+   </div>
+   <script>
+    const allEmails = [
+      { from: 'Sarah Mitchell', email: 'sarah.mitchell@company.com', subject: 'Project update: Q1 roadmap and timeline', preview: 'Let me share the latest updates...', body: 'Hi there,\n\nI wanted to reach out with an update on our current projects for Q1. We\'ve made significant progress on the roadmap and I\'d love to discuss the timeline with you.\n\nKey points to discuss:\n• Feature A implementation status\n• Q1 budget allocation\n• Team resources needed\n\nLooking forward to connecting soon!\n\nBest regards,\nSarah', avatar: 'SM', color: 'from-purple-500 to-pink-500', unread: true, folder: 'inbox' },
+      { from: 'James Wilson', email: 'james.wilson@company.com', subject: 'Meeting notes from Monday\'s standup', preview: 'Here are the notes from our Monday standup...', body: 'Hi Team,\n\nAttached are the notes from our Monday standup. Key action items are:\n\n1. James to follow up on API integration\n2. Sarah to prepare Q1 presentation\n3. Team to review the new design system\n\nPlease let me know if you have any questions!\n\nRegards,\nJames', avatar: 'JW', color: 'from-blue-500 to-cyan-500', unread: false, folder: 'inbox' },
+      { from: 'Emily Johnson', email: 'emily.johnson@design.com', subject: 'Feedback on the design system proposal', preview: 'I\'ve reviewed your design system...', body: 'Hi,\n\nGreat work on the design system proposal! I\'ve gone through it thoroughly and here are my thoughts:\n\nStrengths:\n• Comprehensive component library\n• Good accessibility considerations\n\nAreas to improve:\n• Color palette could be more vibrant\n• Typography scale needs refinement\n\nLet\'s schedule a call to discuss!\n\nBest,\nEmily', avatar: 'EJ', color: 'from-green-500 to-emerald-500', unread: false, folder: 'inbox' },
+      { from: 'Michael Brown', email: 'michael.brown@client.com', subject: 'Client request: urgent site migration', preview: 'Our client needs to migrate...', body: 'Hi,\n\nUrgent: Our client needs to migrate their website to a new server within the next 2 weeks. They\'re concerned about downtime.\n\nCan we set up a meeting to discuss:\n• Migration strategy\n• Rollback plan\n• Testing requirements\n\nPlease let me know your availability!\n\nThanks,\nMichael', avatar: 'MB', color: 'from-orange-500 to-red-500', unread: false, folder: 'work' },
+      { from: 'Laura Thompson', email: 'laura.thompson@finance.com', subject: 'Re: Budget approval for next quarter', preview: 'Regarding the budget proposal...', body: 'Hi,\n\nI\'ve reviewed the budget proposal for Q2. Overall, it looks solid. A few notes:\n\n• Marketing budget: Approved ✓\n• Engineering budget: Pending executive review\n• Operations budget: Approved ✓\n\nI\'ll have the final approvals by end of week.\n\nBest regards,\nLaura', avatar: 'LT', color: 'from-pink-500 to-rose-500', unread: false, folder: 'personal' },
+    ];
+
+    const sentEmails = [
+      { from: 'You', email: 'you@company.com', subject: 'Re: Q1 Planning Session', preview: 'Thanks for sending over the documents...', body: 'Thanks for sending over the documents. I\'ve reviewed them and they look great. I\'ll have my feedback ready by Wednesday.\n\nBest,\nJohn', avatar: 'YO', color: 'from-blue-400 to-indigo-600', unread: false, folder: 'sent' },
+      { from: 'You', email: 'you@company.com', subject: 'Design System Update', preview: 'Here are the latest updates...', body: 'Hi team,\n\nHere are the latest updates to our design system. Please review and provide feedback.\n\nChanges include:\n• New color palette\n• Updated typography\n• New component library\n\nThanks,\nJohn', avatar: 'YO', color: 'from-blue-400 to-indigo-600', unread: false, folder: 'sent' },
+    ];
+
+    const trashEmails = [
+      { from: 'Old Campaign', email: 'campaign@promo.com', subject: '[OLD] Newsletter subscription', preview: 'You received this because...', body: 'This is an old promotional email that has been deleted.', avatar: 'OC', color: 'from-gray-500 to-gray-600', unread: false, folder: 'trash' },
+    ];
+
+    const emailData = {
+      inbox: allEmails.filter(e => e.folder === 'inbox'),
+      starred: allEmails.slice(0, 1),
+      sent: sentEmails,
+      drafts: [{ from: 'You', email: 'you@company.com', subject: '[DRAFT] Team Meeting Notes', preview: 'Notes from today\'s meeting...', body: 'Notes from today\'s meeting:\n\n- Discussed Q1 goals\n- Reviewed project timeline\n- Assigned action items\n\n[This is a draft]', avatar: 'YO', color: 'from-blue-400 to-indigo-600', unread: false, folder: 'drafts' }],
+      important: allEmails.slice(0, 1),
+      work: allEmails.filter(e => e.folder === 'work'),
+      personal: allEmails.filter(e => e.folder === 'personal'),
+      all: allEmails.concat(sentEmails),
+      spam: [],
+      trash: trashEmails,
+    };
+
+    let currentFolder = 'inbox';
+    let currentEmailIndex = null;
+    let splitPaneActive = false;
+    let isResizing = false;
+    let resizeStart = 0;
+    let listPaneWidth = 0;
+
+    function renderEmails(folder) {
+      const emailList = document.getElementById('email-list');
+      emailList.innerHTML = '';
+      const emails = emailData[folder] || [];
+      
+      if (emails.length === 0) {
+        emailList.innerHTML = '<div class="p-8 text-center text-gray-500"><p>No emails in this folder</p></div>';
+        return;
+      }
+
+      emails.forEach((email, index) => {
+        const div = document.createElement('div');
+        div.className = `email-row ${email.unread ? 'unread' : ''} ${currentEmailIndex === index ? 'selected' : ''} px-6 py-4 cursor-pointer`;
+        div.onclick = () => selectEmail(folder, index);
+        
+        const subject = email.subject.includes('[DRAFT]') ? email.subject : (email.folder === 'sent' ? `[Sent] ${email.subject}` : email.subject);
+        
+        div.innerHTML = `
+          <div class="flex items-center gap-4">
+            <input type="checkbox" class="w-5 h-5 rounded border-gray-300 accent-blue-600">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${email.color} flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              ${email.avatar}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-gray-900 font-medium text-sm truncate">${email.from}</p>
+              <p class="text-sm text-gray-600 truncate">${subject}</p>
+            </div>
+            <div class="flex-shrink-0 text-right">
+              <p class="text-xs text-gray-600">2:45 PM</p>
+            </div>
+          </div>
+        `;
+        emailList.appendChild(div);
+      });
+    }
+
+    function switchFolder(folder, event) {
+      event.preventDefault();
+      currentFolder = folder;
+      currentEmailIndex = null;
+      
+      // Update active folder styling
+      document.querySelectorAll('.folder-link').forEach(link => link.classList.remove('active'));
+      event.target.closest('.folder-link').classList.add('active');
+      
+      renderEmails(folder);
+      
+      if (splitPaneActive) {
+        document.getElementById('sender-info').innerHTML = '';
+        document.getElementById('email-subject').innerHTML = '';
+        document.getElementById('email-body').textContent = '';
+      }
+    }
+
+    function selectEmail(folder, index) {
+      currentEmailIndex = index;
+      const emails = emailData[folder] || [];
+      const email = emails[index];
+      if (!email) return;
+      
+      // Auto-enable split pane on email selection
+      if (!splitPaneActive) {
+        splitPaneActive = true;
+        document.getElementById('detail-panel').classList.remove('hidden');
+        document.getElementById('resize-handle').classList.remove('hidden');
+        setupResizeListener();
+      }
+      
+      // Update selected state in list
+      document.querySelectorAll('.email-row').forEach((row, i) => {
+        if (i === index) row.classList.add('selected');
+        else row.classList.remove('selected');
+      });
+      
+      document.getElementById('sender-info').innerHTML = `
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${email.color} flex items-center justify-center text-white text-sm font-semibold">
+              ${email.avatar}
+            </div>
+            <div>
+              <p class="text-gray-900 font-semibold text-sm">${email.from}</p>
+              <p class="text-xs text-gray-600">${email.email}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('email-subject').innerHTML = `<h3 class="text-lg font-bold text-gray-900">${email.subject}</h3>`;
+      document.getElementById('email-body').textContent = email.body;
+    }
+
+    function toggleSplitPane() {
+      if (!splitPaneActive) {
+        splitPaneActive = true;
+        document.getElementById('detail-panel').classList.remove('hidden');
+        document.getElementById('resize-handle').classList.remove('hidden');
+        
+        if (currentEmailIndex !== null) {
+          selectEmail(currentFolder, currentEmailIndex);
+        }
+        
+        setupResizeListener();
+      } else {
+        closeSplitPane();
+      }
+    }
+
+    function closeSplitPane() {
+      splitPaneActive = false;
+      document.getElementById('detail-panel').classList.add('hidden');
+      document.getElementById('resize-handle').classList.add('hidden');
+      document.removeEventListener('mousemove', onResize);
+      document.removeEventListener('mouseup', stopResize);
+    }
+
+    function setupResizeListener() {
+      const handle = document.getElementById('resize-handle');
+      handle.addEventListener('mousedown', startResize);
+    }
+
+    function startResize(e) {
+      isResizing = true;
+      resizeStart = e.clientX;
+      listPaneWidth = document.getElementById('email-list-pane').offsetWidth;
+      document.addEventListener('mousemove', onResize);
+      document.addEventListener('mouseup', stopResize);
+    }
+
+    function onResize(e) {
+      if (!isResizing) return;
+      const diff = e.clientX - resizeStart;
+      const newWidth = Math.max(300, listPaneWidth + diff);
+      document.getElementById('email-list-pane').style.flex = `0 0 ${newWidth}px`;
+    }
+
+    function stopResize() {
+      isResizing = false;
+      document.removeEventListener('mousemove', onResize);
+      document.removeEventListener('mouseup', stopResize);
+    }
+
+    function openCompose() {
+      document.getElementById('compose-modal').classList.remove('hidden');
+    }
+
+    function closeCompose() {
+      document.getElementById('compose-modal').classList.add('hidden');
+    }
+
+    const intranetData = {
+      announcements: [
+        { title: 'Q1 All-Hands Meeting', date: '2024-01-15', author: 'CEO', content: 'Join us for our quarterly all-hands meeting to discuss company updates and Q1 goals. Agenda includes financial results, new product launches, and team celebrations.', icon: '📢' },
+        { title: 'New Employee Onboarding Program', date: '2024-01-12', author: 'HR', content: 'We\'ve launched an improved onboarding program with mentorship opportunities. All new hires will be paired with experienced team members.', icon: '👋' },
+        { title: 'Office Renovation Complete', date: '2024-01-10', author: 'Facilities', content: 'The office renovation is complete! Check out the new collaborative spaces, updated kitchen, and wellness room on the second floor.', icon: '🏢' },
+      ],
+      directory: [
+        { name: 'Sarah Mitchell', title: 'Product Manager', dept: 'Product', email: 'sarah.mitchell@company.com', avatar: 'SM', color: 'from-purple-500 to-pink-500' },
+        { name: 'James Wilson', title: 'Engineering Lead', dept: 'Engineering', email: 'james.wilson@company.com', avatar: 'JW', color: 'from-blue-500 to-cyan-500' },
+        { name: 'Emily Johnson', title: 'Designer', dept: 'Design', email: 'emily.johnson@company.com', avatar: 'EJ', color: 'from-green-500 to-emerald-500' },
+        { name: 'Michael Brown', title: 'Sales Director', dept: 'Sales', email: 'michael.brown@company.com', avatar: 'MB', color: 'from-orange-500 to-red-500' },
+        { name: 'Laura Thompson', title: 'Finance Manager', dept: 'Finance', email: 'laura.thompson@company.com', avatar: 'LT', color: 'from-pink-500 to-rose-500' },
+        { name: 'David Lee', title: 'HR Manager', dept: 'HR', email: 'david.lee@company.com', avatar: 'DL', color: 'from-indigo-500 to-purple-500' },
+      ],
+      documents: [
+        { title: 'Company Handbook 2024', type: 'PDF', size: '2.4 MB', date: '2024-01-01', icon: '📘' },
+        { title: 'Q1 Budget Allocation', type: 'Spreadsheet', size: '1.8 MB', date: '2023-12-20', icon: '📊' },
+        { title: 'Brand Guidelines', type: 'Design', size: '45 MB', date: '2023-11-15', icon: '🎨' },
+        { title: 'Security Policies', type: 'Document', size: '1.2 MB', date: '2023-12-01', icon: '🔐' },
+        { title: 'Employee Benefits Guide', type: 'PDF', size: '3.1 MB', date: '2023-10-10', icon: '💼' },
+      ],
+      teams: [
+        { name: 'Product Team', members: 8, lead: 'Sarah Mitchell', description: 'Building amazing products' },
+        { name: 'Engineering Team', members: 12, lead: 'James Wilson', description: 'Shipping quality code' },
+        { name: 'Design Team', members: 5, lead: 'Emily Johnson', description: 'Creating beautiful experiences' },
+        { name: 'Sales Team', members: 6, lead: 'Michael Brown', description: 'Growing the business' },
+      ]
+    };
+
+    function renderAnnouncements() {
+      const list = document.getElementById('announcements-list');
+      list.innerHTML = '';
+      intranetData.announcements.forEach(ann => {
+        const div = document.createElement('div');
+        div.className = 'bg-blue-50 border border-blue-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer';
+        div.innerHTML = `
+          <div class="flex gap-3">
+            <div class="text-2xl">${ann.icon}</div>
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900">${ann.title}</h3>
+              <p class="text-sm text-gray-600 mt-1">${ann.content}</p>
+              <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                <span>${ann.author}</span>
+                <span>${ann.date}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function renderDirectory() {
+      const list = document.getElementById('directory-list');
+      list.innerHTML = '';
+      intranetData.directory.forEach(person => {
+        const div = document.createElement('div');
+        div.className = 'bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow';
+        div.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br ${person.color} flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              ${person.avatar}
+            </div>
+            <div class="flex-1">
+              <p class="font-semibold text-gray-900">${person.name}</p>
+              <p class="text-sm text-gray-600">${person.title}</p>
+              <p class="text-xs text-gray-500 mt-1">${person.dept}</p>
+              <a href="#" class="text-xs text-blue-600 hover:text-blue-700 mt-2 inline-block">${person.email}</a>
+            </div>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function renderDocuments() {
+      const list = document.getElementById('documents-list');
+      list.innerHTML = '';
+      intranetData.documents.forEach(doc => {
+        const div = document.createElement('div');
+        div.className = 'bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow flex items-center justify-between';
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="text-2xl">${doc.icon}</div>
+            <div>
+              <p class="font-semibold text-gray-900">${doc.title}</p>
+              <p class="text-xs text-gray-600">${doc.type} • ${doc.size}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-600">${doc.date}</p>
+            <button class="text-blue-600 hover:text-blue-700 text-xs font-medium mt-1">Download</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function renderTeams() {
+      const list = document.getElementById('teams-list');
+      list.innerHTML = '';
+      intranetData.teams.forEach(team => {
+        const div = document.createElement('div');
+        div.className = 'bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow';
+        div.innerHTML = `
+          <h3 class="font-semibold text-gray-900 mb-2">${team.name}</h3>
+          <p class="text-sm text-gray-600 mb-3">${team.description}</p>
+          <div class="space-y-1 text-sm">
+            <p><span class="text-gray-600">Lead:</span> <span class="text-gray-900 font-medium">${team.lead}</span></p>
+            <p><span class="text-gray-600">Members:</span> <span class="text-gray-900 font-medium">${team.members}</span></p>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function switchIntranetTab(tab, event) {
+      event.preventDefault();
+      document.querySelectorAll('[id$="-tab"]').forEach(t => t.classList.add('hidden'));
+      document.getElementById(tab + '-tab').classList.remove('hidden');
+      
+      document.querySelectorAll('.folder-link').forEach(link => link.classList.remove('active'));
+      event.target.closest('.folder-link').classList.add('active');
+      
+      if (tab === 'announcements') renderAnnouncements();
+      if (tab === 'directory') renderDirectory();
+      if (tab === 'documents') renderDocuments();
+      if (tab === 'teams') renderTeams();
+    }
+
+    function switchSection(section, event) {
+      event.preventDefault();
+      document.getElementById('gmail-section').classList.toggle('hidden', section !== 'gmail');
+      document.getElementById('intranet-section').classList.toggle('hidden', section !== 'intranet');
+      
+      document.querySelectorAll('.section-tab').forEach(tab => tab.classList.remove('active', 'border-red-500', 'border-blue-600'));
+      const activeBtn = event.target.closest('.section-tab');
+      activeBtn.classList.add('active');
+      if (section === 'gmail') {
+        activeBtn.classList.add('border-red-500');
+        activeBtn.style.color = '#c5221f';
+      } else {
+        activeBtn.classList.add('border-blue-600');
+        activeBtn.style.color = '#1f2937';
+      }
+      
+      if (section === 'intranet' && intranetData.announcements.length > 0) {
+        renderAnnouncements();
+      }
+    }
+
+    function openAnnouncement() {
+      alert('Post Update feature - add new announcement');
+    }
+
+    const defaultConfig = { app_title: 'Gmail & Intranet', search_placeholder: 'Search...', company_name: 'Acme Corp', announcement_title: 'Latest Company Updates' };
+
+    async function onConfigChange(config) {
+      const appTitle = config.app_title || defaultConfig.app_title;
+      const searchPlaceholder = config.search_placeholder || defaultConfig.search_placeholder;
+      const companyName = config.company_name || defaultConfig.company_name;
+      const announcementTitle = config.announcement_title || defaultConfig.announcement_title;
+      
+      document.getElementById('app-title').textContent = appTitle;
+      document.getElementById('search-input').placeholder = searchPlaceholder;
+      document.getElementById('company-name').textContent = companyName;
+      document.getElementById('announcement_title').textContent = announcementTitle;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['app_title', config.app_title || defaultConfig.app_title],
+        ['search_placeholder', config.search_placeholder || defaultConfig.search_placeholder],
+        ['company_name', config.company_name || defaultConfig.company_name],
+        ['announcement_title', config.announcement_title || defaultConfig.announcement_title]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    // Initial render
+    renderEmails('inbox');
+  </script>
+  </div>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9daa513112eb06fb',t:'MTc3MzIyOTU3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+
