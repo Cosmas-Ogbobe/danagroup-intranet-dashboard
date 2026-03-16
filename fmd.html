@@ -238,6 +238,32 @@ font-size:13px;
 color:#777;
 margin-top:20px;
 }
+/* Pending Work Orders */
+
+.work-orders{
+margin-top:10px;
+}
+
+.work-orders ul{
+list-style:none;
+padding:0;
+margin-top:10px;
+cursor: pointer;
+}
+
+.work-orders li{
+padding:10px 12px;
+margin-bottom:8px;
+background:#f4f7fb;
+border-left:4px solid #db3214;
+border-radius:6px;
+font-size:14px;
+color:#333;
+}
+
+.work-orders li:hover{
+background:#eef2f8;
+}
 
 </style>
 
@@ -253,6 +279,7 @@ margin-top:20px;
 
 <ul class="menu">
     <li><a href="#"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+    <li><a href="#"><i data-lucide="users"></i> Users</a></li>
     <li><a href="#"><i data-lucide="package"></i> Assets</a></li>
     <li><a href="#"><i data-lucide="car"></i> Vehicles</a></li>
     <!-- <li><a href="#"><i data-lucide="calendar"></i> Bookings</a></li> -->
@@ -265,7 +292,6 @@ margin-top:20px;
     <!-- <li><a href="#"><i data-lucide="zap"></i> Utilities</a></li> -->
     <li><a href="#"><i data-lucide="shield-check"></i> Safety & Compliance</a></li>
     <li><a href="#"><i data-lucide="file-text"></i> Reports</a></li>
-    <li><a href="#"><i data-lucide="users"></i> Staff</a></li>
     <li><a href="#"><i data-lucide="map"></i> Tracking</a></li>
     <li><a href="#"><i data-lucide="settings"></i> Settings</a></li>
 </ul>
@@ -353,16 +379,18 @@ Maintenance
 
 <div class="panels">
 
-<!-- GPS TRACKING -->
+<!-- pending orders -->
 
 <div class="card">
-
-<h3>Live Vehicle Tracking</h3>
-
-<!-- <div class="map">
-GPS MAP INTEGRATION AREA
-</div> -->
-
+    <div class="work-orders">
+        <h3>Pending Work Orders</h3>
+        <ul>
+            <li>AC repair Admin Block</li>
+            <li>Electrical fault KP</li>
+            <li>Generator inspection</li>
+            <li>Plumbing Staff Kitchen</li>
+        </ul>
+    </div>
 </div>
 
 
@@ -377,11 +405,14 @@ Vehicle FG-204-AA requires urgent brake service
 </div>
 
 <div class="alert alert-orange">
-Toyota Hilux oil change due in 3 days
+Cerato IHS 450 oil change due in 3 days
 </div>
 
 <div class="alert alert-orange">
-Ford Ranger inspection due next week
+Rio MUS 108 DA Road Worthiness Renewal due next week
+</div>
+<div class="alert alert-orange">
+Ilado Generator Service due in 5 days
 </div>
 
 </div>
