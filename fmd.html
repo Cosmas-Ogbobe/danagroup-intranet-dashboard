@@ -175,6 +175,69 @@ justify-content:center;
 border-radius:8px;
 color:#555;
 }
+/* USER PROFILE */
+
+.user-area{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.user-area a{
+display:flex;
+align-items:center;
+gap:6px;
+text-decoration:none;
+color:#333;
+font-size:14px;
+}
+
+.user-area a:hover{
+color:#db3214;
+}
+
+/* FOOTER */
+
+.footer{
+text-align:center;
+padding:15px;
+font-size:13px;
+color:#777;
+margin-top:20px;
+}
+/* USER PROFILE */
+
+.user-area{
+display:flex;
+align-items:center;
+gap:15px;
+border-radius: 10px;
+border: 2px solid #00356B;
+padding: 5px 10px;
+}
+
+.user-area a{
+display:flex;
+align-items:center;
+gap:6px;
+text-decoration:none;
+color:#333;
+font-size:14px;
+}
+
+.user-area a:hover{
+color:#db3214;
+}
+
+/* FOOTER */
+
+.footer{
+text-align:center;
+padding:15px;
+font-size:13px;
+color:#777;
+margin-top:20px;
+}
 
 </style>
 
@@ -186,17 +249,25 @@ color:#555;
 
 <div class="sidebar">
 
-<div class="logo">Fleet System</div>
+<div class="logo">Facility Mgt System</div>
 
 <ul class="menu">
-
-<li><a href="#"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
-<li><a href="#"><i data-lucide="car"></i> Vehicles</a></li>
-<li><a href="#"><i data-lucide="calendar"></i> Bookings</a></li>
-<li><a href="#"><i data-lucide="wrench"></i> Maintenance</a></li>
-<li><a href="#"><i data-lucide="map"></i> Tracking</a></li>
-<li><a href="#"><i data-lucide="file-text"></i> Reports</a></li>
-
+    <li><a href="#"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+    <li><a href="#"><i data-lucide="package"></i> Assets</a></li>
+    <li><a href="#"><i data-lucide="car"></i> Vehicles</a></li>
+    <!-- <li><a href="#"><i data-lucide="calendar"></i> Bookings</a></li> -->
+    <li><a href="#"><i data-lucide="clipboard-list"></i> Work Orders</a></li>
+    <li><a href="#"><i data-lucide="wrench"></i> Maintenance</a></li>
+    <li><a href="#"><i data-lucide="message-square"></i> Service Requests</a></li>
+    <!-- <li><a href="#"><i data-lucide="boxes"></i> Inventory</a></li> -->
+    <li><a href="#"><i data-lucide="briefcase"></i> Vendors</a></li>
+    <!-- <li><a href="#"><i data-lucide="layout-grid"></i> Spaces</a></li> -->
+    <!-- <li><a href="#"><i data-lucide="zap"></i> Utilities</a></li> -->
+    <li><a href="#"><i data-lucide="shield-check"></i> Safety & Compliance</a></li>
+    <li><a href="#"><i data-lucide="file-text"></i> Reports</a></li>
+    <li><a href="#"><i data-lucide="users"></i> Staff</a></li>
+    <li><a href="#"><i data-lucide="map"></i> Tracking</a></li>
+    <li><a href="#"><i data-lucide="settings"></i> Settings</a></li>
 </ul>
 
 </div>
@@ -205,7 +276,23 @@ color:#555;
 <div class="main">
 
 <div class="topbar">
+
 <h3>Fleet & Facility Enterprise Dashboard</h3>
+
+<div class="user-area">
+
+<a href="#">
+<i data-lucide="user"></i>
+Admin
+</a>
+
+<a href="#">
+<i data-lucide="log-out"></i>
+Logout
+</a>
+
+</div>
+
 </div>
 
 <!-- STATS -->
@@ -341,7 +428,9 @@ Ford Ranger inspection due next week
 </table>
 
 </div>
-
+<div class="footer">
+© 2026 Danagroup— All Rights Reserved
+</div>
 </div>
 
 
