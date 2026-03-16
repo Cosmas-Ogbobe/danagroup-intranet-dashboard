@@ -37,7 +37,7 @@
   <div class="flex h-full w-full"><!-- Top Navigation Tabs -->
    <div class="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center gap-8 px-6 z-40">
     <h1 id="app-title" class="text-xl font-bold text-gray-900" style="color: #202124; min-width: fit-content;">Intranet Email</h1>
-    <div class="flex gap-1 flex-1"><button onclick="switchSection('gmail', event)" class="section-tab active px-4 py-2 text-sm font-medium text-gray-900 border-b-2 border-red-500 transition-colors" style="color: #c5221f;">📧 Gmail</button> <button onclick="switchSection('intranet', event)" class="section-tab px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-900 transition-colors">🏢 Intranet</button>
+    <div class="flex gap-1 flex-1"><button onclick="switchSection('gmail', event)" class="section-tab active px-4 py-2 text-sm font-medium text-gray-900 border-b-2 border-red-500 transition-colors" style="color: #c5221f;">📧 Email</button>
     </div>
    </div>
    <div class="flex h-full w-full pt-14"><!-- Gmail Section -->
@@ -461,39 +461,9 @@
       });
     }
 
-    function switchIntranetTab(tab, event) {
-      event.preventDefault();
-      document.querySelectorAll('[id$="-tab"]').forEach(t => t.classList.add('hidden'));
-      document.getElementById(tab + '-tab').classList.remove('hidden');
-      
-      document.querySelectorAll('.folder-link').forEach(link => link.classList.remove('active'));
-      event.target.closest('.folder-link').classList.add('active');
-      
-      if (tab === 'announcements') renderAnnouncements();
-      if (tab === 'directory') renderDirectory();
-      if (tab === 'documents') renderDocuments();
-      if (tab === 'teams') renderTeams();
-    }
+    
 
-    function switchSection(section, event) {
-      event.preventDefault();
-      document.getElementById('gmail-section').classList.toggle('hidden', section !== 'gmail');
-      document.getElementById('intranet-section').classList.toggle('hidden', section !== 'intranet');
-      
-      document.querySelectorAll('.section-tab').forEach(tab => tab.classList.remove('active', 'border-red-500', 'border-blue-600'));
-      const activeBtn = event.target.closest('.section-tab');
-      activeBtn.classList.add('active');
-      if (section === 'gmail') {
-        activeBtn.classList.add('border-red-500');
-        activeBtn.style.color = '#c5221f';
-      } else {
-        activeBtn.classList.add('border-blue-600');
-        activeBtn.style.color = '#1f2937';
-      }
-      
-      <!-- if (section === 'intranet' && intranetData.announcements.length > 0) { -->
-        renderAnnouncements();
-      }
+   
     
 
     function openAnnouncement() {
