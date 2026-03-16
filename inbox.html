@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gmail</title>
+  <title>Intranet Email</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <style>
@@ -36,7 +36,7 @@
  <body class="h-full bg-white text-gray-900 overflow-hidden">
   <div class="flex h-full w-full"><!-- Top Navigation Tabs -->
    <div class="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center gap-8 px-6 z-40">
-    <h1 id="app-title" class="text-xl font-bold text-gray-900" style="color: #202124; min-width: fit-content;">Gmail &amp; Intranet</h1>
+    <h1 id="app-title" class="text-xl font-bold text-gray-900" style="color: #202124; min-width: fit-content;">Intranet Email</h1>
     <div class="flex gap-1 flex-1"><button onclick="switchSection('gmail', event)" class="section-tab active px-4 py-2 text-sm font-medium text-gray-900 border-b-2 border-red-500 transition-colors" style="color: #c5221f;">📧 Gmail</button> <button onclick="switchSection('intranet', event)" class="section-tab px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-900 transition-colors">🏢 Intranet</button>
     </div>
    </div>
@@ -44,7 +44,7 @@
     <div id="gmail-section" class="flex h-full w-full"><!-- Sidebar -->
      <aside class="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0"><!-- Header -->
       <div class="p-4 border-b border-gray-200">
-       <h1 id="app-title" class="text-2xl font-bold text-gray-900 mb-4" style="color: #202124;">Gmail</h1><button onclick="openCompose()" class="compose-btn w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-full flex items-center justify-center gap-2">
+       <h1 id="app-title" class="text-2xl font-bold text-gray-900 mb-4" style="color: #202124;"></h1><button onclick="openCompose()" class="compose-btn w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-full flex items-center justify-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg> Compose </button>
       </div><!-- Folders -->
@@ -123,15 +123,8 @@
        </div>
       </div>
      </main>
-    </div><!-- Intranet Section -->
-    <div id="intranet-section" class="hidden h-full w-full flex flex-col"><!-- Intranet Sidebar -->
-     <aside class="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
-      <div class="p-4 border-b border-gray-200">
-       <h2 id="company-name" class="text-2xl font-bold text-gray-900 mb-4" style="color: #202124;">Acme Corp</h2><button onclick="openAnnouncement()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg> Post Update </button>
-      </div>
-      <nav class="flex-1 p-3 overflow-y-auto space-y-0">
+    
+      <!-- <nav class="flex-1 p-3 overflow-y-auto space-y-0">
        <div class="space-y-1"><a href="#" onclick="switchIntranetTab('announcements', event)" class="folder-link active w-full flex items-center gap-3 px-3 py-2 rounded-r-full text-gray-900" style="color: #1f2937;">
          <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M21 16V8c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-11-7h6v6h-6v-6z" />
          </svg><span class="flex-1 text-sm font-medium">Announcements</span> </a> <a href="#" onclick="switchIntranetTab('directory', event)" class="folder-link w-full flex items-center gap-3 px-3 py-2 rounded-r-full" style="color: #5f6368;">
@@ -142,41 +135,9 @@
          <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
          </svg><span class="flex-1 text-sm">Teams</span> </a>
        </div>
-      </nav>
-     </aside><!-- Intranet Main Content -->
-     <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
-      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
-       <div class="flex-1 flex items-center gap-4"><input type="text" placeholder="Search intranet..." class="flex-1 max-w-md bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-gray-400 transition-all" style="color: #3c4043;">
-       </div>
-       <div class="flex items-center gap-4"><button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" title="Settings">
-         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-         </svg></button>
-       </div>
-      </header>
-      <div class="flex-1 overflow-y-auto p-6"><!-- Announcements Tab -->
-       <div id="announcements-tab" class="space-y-4">
-        <h2 id="announcement_title" class="text-2xl font-bold text-gray-900 mb-6">Latest Company Updates</h2>
-        <div id="announcements-list" class="space-y-4"><!-- Announcements populated by JS -->
-        </div>
-       </div><!-- Directory Tab -->
-       <div id="directory-tab" class="hidden">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Employee Directory</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="directory-list"><!-- Directory populated by JS -->
-        </div>
-       </div><!-- Documents Tab -->
-       <div id="documents-tab" class="hidden">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Company Documents</h2>
-        <div class="space-y-3" id="documents-list"><!-- Documents populated by JS -->
-        </div>
-       </div><!-- Teams Tab -->
-       <div id="teams-tab" class="hidden">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Teams</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="teams-list"><!-- Teams populated by JS -->
-        </div>
-       </div>
-      </div>
-     </main>
-    </div>
+      </nav> -->
+     ?
+    <!-- </div> -->
    </div><!-- Compose Modal -->
    <div id="compose-modal" class="hidden fixed inset-0 z-50 flex items-end justify-end p-4">
     <div class="compose-backdrop fixed inset-0 bg-black/20" onclick="closeCompose()"></div>
@@ -530,10 +491,10 @@
         activeBtn.style.color = '#1f2937';
       }
       
-      if (section === 'intranet' && intranetData.announcements.length > 0) {
+      <!-- if (section === 'intranet' && intranetData.announcements.length > 0) { -->
         renderAnnouncements();
       }
-    }
+    
 
     function openAnnouncement() {
       alert('Post Update feature - add new announcement');
